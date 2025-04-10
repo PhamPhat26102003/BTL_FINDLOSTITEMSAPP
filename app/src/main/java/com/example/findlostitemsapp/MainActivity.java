@@ -33,7 +33,11 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference usersRef = firebaseConnector.getUsersReference();
         DatabaseReference postsRef = firebaseConnector.getPostsReference();
 
-        Log.d(TAG, "Đã kết nối tới bảng users: " + usersRef.toString());
-        Log.d(TAG, "Đã kết nối tới bảng posts: " + postsRef.toString());
+        // Ghi log lên Firebase
+        String userMessage = "Đã kết nối tới bảng users: " + usersRef.toString();
+        String postMessage = "Đã kết nối tới bảng posts: " + postsRef.toString();
+
+        firebaseConnector.logConnectionMessage(userMessage);
+        firebaseConnector.logConnectionMessage(postMessage);
     }
 }

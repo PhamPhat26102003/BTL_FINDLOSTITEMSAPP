@@ -36,4 +36,22 @@ public class FirebaseDatabaseHelper {
     public DatabaseReference getPostsReference() {
         return databaseReference.child("posts");
     }
+
+    // Thêm phương thức mới để ghi log lên Firebase
+    public void logConnectionMessage(String message) {
+        DatabaseReference logsRef = databaseReference.child("connection_logs");
+        String logId = logsRef.push().getKey(); // Tạo ID tự động
+        logsRef.child(logId).setValue(new ConnectionLog(System.currentTimeMillis(), message));
+    }
+
+    // Class nhỏ để lưu trữ log
+    private static class ConnectionLog {
+        public long timestamp;
+        public String message;
+
+        public ConnectionLog(long timestamp, String message) {
+            this.timestamp = timestamp;
+            this.message = message;
+        }
+    }
 }
