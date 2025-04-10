@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "144477079876",
+    "project_id": "dbfindlostitemsapp",
+    "storage_bucket": "dbfindlostitemsapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144477079876:android:30c58a524c7f9b75016f11",
+        "android_client_info": {
+          "package_name": "com.example.findlostitemsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2WjCdmNLNR8zr1I6PXN6rB_i9dfln1Xo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
