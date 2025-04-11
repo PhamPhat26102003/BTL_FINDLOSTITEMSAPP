@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">FindLostItemsApp</string>
+    <string name="search_hint">Nhập từ khóa...</string>
+    <string name="menu">Menu</string>
+    <string name="post_lost_item">Đăng tin tìm đồ ngay</string>
+    <string name="post_found_item">Đăng tin đồ nhặt được</string>
+    <string name="see_now">Xem ngay</string>
+    <string name="bannerTitle">Kết nối ✨ Tìm kiếm ✨</string>
+    <string name="bannerSubTitle">Nền tảng hiện đại giúp bạn tìm lại đồ thất lạc một cách nhanh chóng và hiệu quả.</string>
+    <string name="see_detail">Xem Chi Tiết</string>
+    <string name="bannerSub">Hoàn trả</string>
+    <string name="congratulations">🎉 Chúc mừng! Các bạn đã tìm thấy đồ</string>
+    <string name="warning">Lưu ý: Hiện có những người lừa đảo, mạo danh nhận được giấy tờ. Hãy cẩn thận xác nhận thông tin giấy tờ để tránh điều không mong muốn.</string>
+    <string name="online_support">Hỗ trợ trực tuyến 24/7</string>
+    <string name="congrats_found">Chúc mừng! Các bạn đã tìm thấy đồ</string>
 </resources>

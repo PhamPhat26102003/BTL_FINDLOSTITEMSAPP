@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="@android:color/white"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Logo hình tròn bên trái -->
+    <FrameLayout
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/iconapp"
+            android:scaleType="centerInside"
+            android:backgroundTint="@color/light_blue"/>
+    </FrameLayout>
+
+    <!-- Ô tìm kiếm -->
+    <EditText
+        android:id="@+id/editTextSearch"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:background="@drawable/search_field_background"
+        android:hint="Nhập từ khóa..."
+        android:inputType="text"
+        android:paddingHorizontal="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#999999" />
+
+    <!-- Nút tìm kiếm -->
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_button_background">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@android:drawable/ic_menu_search"
+            android:scaleType="centerInside"
+            android:backgroundTint="@color/light_blue"/>
+    </FrameLayout>
+
+    <!-- Avatar tròn bên phải -->
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_button_background">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            android:scaleType="centerInside"
+            android:backgroundTint="@color/light_blue"/>
+    </FrameLayout>
+
+    <!-- Icon dropdown -->
+    <ImageView
+        android:id="@+id/btnDropdown"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_down"
+        android:layout_gravity="center"
+        android:contentDescription="Menu tài khoản"
+        android:padding="4dp" />
+</LinearLayout>

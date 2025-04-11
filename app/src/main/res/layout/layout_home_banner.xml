@@ -1,0 +1,71 @@
+<androidx.cardview.widget.CardView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@drawable/banner_background"
+        android:padding="20dp">
+
+        <!-- Tiêu đề -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bannerTitle"
+            android:textColor="@android:color/white"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bannerSub"
+            android:textColor="@android:color/white"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Mô tả -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bannerSubTitle"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- 2 Button ngang -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Nút đăng tin tìm -->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng tin tìm đồ ngay +"
+                android:textSize="14sp"
+                android:textColor="#3D00A8"
+                android:backgroundTint="#FFFFFF" />
+
+            <!-- Nút đăng tin nhặt -->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng tin đồ nhặt được ✓"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#00D46F"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
