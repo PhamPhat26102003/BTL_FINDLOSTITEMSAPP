@@ -1,0 +1,12 @@
+<resources>
+    <!-- Style cho PopupMenu -->
+    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@color/popup_menu_text_color</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- Theme overlay áp dụng style trên -->
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="popupMenuStyle">@style/PopupMenuStyle</item>
+    </style>
+</resources>
