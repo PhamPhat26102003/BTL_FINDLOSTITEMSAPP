@@ -1,4 +1,4 @@
-package com.example.findlostitemsapp;
+package com.example.findlostitemsapp.pages.uiutils;
 
 import android.graphics.Color;
 import android.text.Spannable;

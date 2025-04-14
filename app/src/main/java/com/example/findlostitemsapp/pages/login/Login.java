@@ -1,15 +1,15 @@
-package com.example.findlostitemsapp;
+package com.example.findlostitemsapp.pages.login;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.example.findlostitemsapp.R;
+import com.example.findlostitemsapp.pages.register.Register;
+import com.example.findlostitemsapp.pages.uiutils.UiUtils;
 
 public class Login extends AppCompatActivity {
 
