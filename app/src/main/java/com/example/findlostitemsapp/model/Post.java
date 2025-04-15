@@ -12,8 +12,8 @@ public class Post {
     private String description;
     private String itemCategory; // Danh mục đồ vật
     private String location; // Địa điểm mất/địa điểm nhặt được
-    private Date lostDate; // Ngày mất
-    private Date postDate; // Ngày đăng bài
+    private String lostDate; // Ngày mất
+    private String postDate; // Ngày đăng bài
     private List<String> imageUrls; // Danh sách URL hình ảnh
     private boolean isFound; // Đã tìm thấy chưa
     private String contactInfo;
@@ -28,8 +28,8 @@ public class Post {
         result.put("description", description);
         result.put("itemCategory", itemCategory);
         result.put("location", location);
-        result.put("lostDate", lostDate.getTime()); // Lưu dưới dạng timestamp
-        result.put("postDate", postDate.getTime());
+        result.put("lostDate", lostDate);
+        result.put("postDate", postDate);
         result.put("imageUrls", imageUrls);
         result.put("isFound", isFound);
         result.put("contactInfo", contactInfo);
@@ -37,13 +37,32 @@ public class Post {
         return result;
     }
 
+    // hàm formmap lay du lieu
+    public static Post fromMap(Map<String, Object> map) {
+        Post post = new Post();
+        post.setPostId((String) map.get("postId"));
+        post.setUserId((String) map.get("userId"));
+        post.setTitle((String) map.get("title"));
+        post.setDescription((String) map.get("description"));
+        post.setItemCategory((String) map.get("itemCategory"));
+        post.setLocation((String) map.get("location"));
+        post.setLostDate((String) map.get("lostDate"));
+        post.setPostDate(map.get("postDate") != null ? (String) map.get("postDate") : "");
+        post.setImageUrls((List<String>) map.get("imageUrls"));
+        post.setIsFound((Boolean) map.get("isFound"));
+        post.setContactInfo((String) map.get("contactInfo"));
+        post.setTag((String) map.get("tag"));
+        return post;
+    }
+
+
 
     // Constructors
     public Post() {
         // Constructor mặc định cần thiết cho Firebase
     }
 
-    public Post(String postId, String userId, String title, String description, String itemCategory, String location, Date lostDate, Date postDate, List<String> imageUrls, boolean isFound, String contactInfo, String tag) {
+    public Post(String postId, String userId, String title, String description, String itemCategory, String location, String lostDate, String postDate, List<String> imageUrls, boolean isFound, String contactInfo, String tag) {
         this.postId = postId;
         this.userId = userId;
         this.title = title;
@@ -106,19 +125,19 @@ public class Post {
         this.location = location;
     }
 
-    public Date getLostDate() {
+    public String getLostDate() {
         return lostDate;
     }
 
-    public void setLostDate(Date lostDate) {
+    public void setLostDate(String lostDate) {
         this.lostDate = lostDate;
     }
 
-    public Date getPostDate() {
+    public String getPostDate() {
         return postDate;
     }
 
-    public void setPostDate(Date postDate) {
+    public void setPostDate(String postDate) {
         this.postDate = postDate;
     }
 
@@ -130,12 +149,12 @@ public class Post {
         this.imageUrls = imageUrls;
     }
 
-    public boolean isFound() {
+    public boolean getIsFound() {
         return isFound;
     }
 
-    public void setFound(boolean found) {
-        isFound = found;
+    public void setIsFound(boolean found) {
+        this.isFound = found;
     }
 
     public String getContactInfo() {
