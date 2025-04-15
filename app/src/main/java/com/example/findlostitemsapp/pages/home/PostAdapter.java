@@ -7,12 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.model.Post;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,11 +84,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.tvViews.setText("👁 1 lượt xem"); // Cần cải thiện nếu có trường views
 
         long currentTime = System.currentTimeMillis();
-        long postTime = post.getPostDate() != 0 ? post.getPostDate() : currentTime; // Kiểm tra giá trị postDate, nếu là 0 thì dùng currentTime
+        // Chuyển đổi postDate từ String thành Date để tính toán
+        String postDateStr = post.getPostDate();
+        long postTime = 0;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date postDate = sdf.parse(postDateStr); // Chuyển đổi String thành Date
+            postTime = postDate != null ? postDate.getTime() : currentTime; // Lấy thời gian theo dạng millis
+        } catch (ParseException e) {
+            postTime = currentTime; // Nếu lỗi thì dùng currentTime
+        }
 
 // Tính sự chênh lệch thời gian (số ngày đã trôi qua)
         long diffInMillis = currentTime - postTime;
         long daysDiff = TimeUnit.MILLISECONDS.toDays(diffInMillis);
+// Hiển thị số ngày đã đăng
         holder.tvTimeAgo.setText("🕒 " + daysDiff + " ngày trước");
 
 // Hiển thị thông tin liên lạc, địa điểm và vai trò
@@ -93,14 +107,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.tvRole.setText("👤 Quản trị viên"); // Cần cải thiện nếu có trường role
 
 // Hiển thị ngày đăng bài dưới định dạng yyyy-MM-dd
+        // Hiển thị ngày đăng dưới dạng yyyy-MM-dd
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        holder.tvPostDate.setText("📅 " + dateFormat.format(new Date(post.getPostDate() != 0 ? post.getPostDate() : currentTime)));
-
-        holder.itemView.setOnClickListener(v -> {
-            if (onPostClickListener != null) {
-                onPostClickListener.onPostClick(post);
-            }
-        });
+        try {
+            Date postDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(postDateStr);
+            holder.tvPostDate.setText("📅 " + dateFormat.format(postDate != null ? postDate : new Date()));
+        } catch (ParseException e) {
+            // Nếu lỗi, hiển thị ngày hiện tại
+            holder.tvPostDate.setText("📅 " + dateFormat.format(new Date()));
+        }
     }
 
     @Override

@@ -12,8 +12,8 @@ public class Post {
     private String description;
     private String itemCategory; // Danh mục đồ vật
     private String location; // Địa điểm mất/địa điểm nhặt được
-    private long lostDate; // Ngày mất
-    private long postDate; // Ngày đăng bài
+    private String lostDate; // Ngày mất
+    private String postDate; // Ngày đăng bài
     private List<String> imageUrls; // Danh sách URL hình ảnh
     private boolean isFound; // Đã tìm thấy chưa
     private String contactInfo;
@@ -46,8 +46,8 @@ public class Post {
         post.setDescription((String) map.get("description"));
         post.setItemCategory((String) map.get("itemCategory"));
         post.setLocation((String) map.get("location"));
-        post.setLostDate((Long) map.get("lostDate"));
-        post.setPostDate((Long) map.get("postDate"));
+        post.setLostDate((String) map.get("lostDate"));
+        post.setPostDate(map.get("postDate") != null ? (String) map.get("postDate") : "");
         post.setImageUrls((List<String>) map.get("imageUrls"));
         post.setIsFound((Boolean) map.get("isFound"));
         post.setContactInfo((String) map.get("contactInfo"));
@@ -62,7 +62,7 @@ public class Post {
         // Constructor mặc định cần thiết cho Firebase
     }
 
-    public Post(String postId, String userId, String title, String description, String itemCategory, String location, long lostDate, long postDate, List<String> imageUrls, boolean isFound, String contactInfo, String tag) {
+    public Post(String postId, String userId, String title, String description, String itemCategory, String location, String lostDate, String postDate, List<String> imageUrls, boolean isFound, String contactInfo, String tag) {
         this.postId = postId;
         this.userId = userId;
         this.title = title;
@@ -125,19 +125,19 @@ public class Post {
         this.location = location;
     }
 
-    public long getLostDate() {
+    public String getLostDate() {
         return lostDate;
     }
 
-    public void setLostDate(long lostDate) {
+    public void setLostDate(String lostDate) {
         this.lostDate = lostDate;
     }
 
-    public long getPostDate() {
+    public String getPostDate() {
         return postDate;
     }
 
-    public void setPostDate(long postDate) {
+    public void setPostDate(String postDate) {
         this.postDate = postDate;
     }
 
