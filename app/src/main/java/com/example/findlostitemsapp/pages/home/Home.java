@@ -4,25 +4,34 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.model.Post;
 import com.example.findlostitemsapp.pages.login.Login;
+import com.example.findlostitemsapp.pages.notification.NotificationActivity;
 import com.example.findlostitemsapp.pages.post.PostDetailActivity;
+import com.example.findlostitemsapp.pages.profile.ProfileActivity;
+import com.example.findlostitemsapp.pages.search.SearchActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -33,6 +42,8 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
     LinearLayout socialButtons;
     private RecyclerView recyclerViewPosts;
     private PostAdapter postAdapter;
+    private ImageView btnDropdown;
+    private BottomNavigationView bottomNav;
     private List<Post> postList;
     private DatabaseReference databaseReference;
 
@@ -41,11 +52,8 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Khởi tạo các view
-        fabToggle = findViewById(R.id.fabToggle);
-        socialButtons = findViewById(R.id.socialButtons);
-        ImageView btnDropdown = findViewById(R.id.btnDropdown);
-        recyclerViewPosts = findViewById(R.id.recyclerViewPosts);
+
+        initUi();
 
         // Khởi tạo RecyclerView và PostAdapter
         postList = new ArrayList<>();
@@ -88,7 +96,43 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
             });
             popupMenu.show();
         });
+
+        bottomNavigationBarAction();
+
     }
+
+    private void bottomNavigationBarAction() {
+        Map<Integer, Runnable> menuActions = new HashMap<>();
+        menuActions.put(R.id.nav_home, () -> openHome());
+        menuActions.put(R.id.nav_search, () -> openSearch());
+        menuActions.put(R.id.nav_post, () -> openPost());
+        menuActions.put(R.id.nav_notifications, () -> openNotification());
+        menuActions.put(R.id.nav_profile, () -> openProfile());
+        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                Runnable action = menuActions.get(item.getItemId());
+                if (action != null) {
+                    action.run();
+                    return true;
+                }
+                return false;
+
+            }
+        });
+    }
+
+
+    private void initUi() {
+        // Khởi tạo các view
+        fabToggle = findViewById(R.id.fabToggle);
+        socialButtons = findViewById(R.id.socialButtons);
+        btnDropdown = findViewById(R.id.btnDropdown);
+        recyclerViewPosts = findViewById(R.id.recyclerViewPosts);
+        bottomNav = findViewById(R.id.bottomNav);
+    }
+
 
     private void loadPostsFromFirebase() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -155,7 +199,31 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
 
     private void gotoPostDetailActivity(Post post) {
         Intent intent = new Intent(Home.this, PostDetailActivity.class);
-        intent.putExtra("post_data",post);
+        intent.putExtra("post_data", post);
         startActivity(intent);
+    }
+
+    private void openProfile() {
+        Intent intent = new Intent(Home.this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    private void openNotification() {
+        Intent intent = new Intent(Home.this, NotificationActivity.class);
+        startActivity(intent);
+    }
+
+    private void openPost() {
+        Intent intent = new Intent(Home.this, com.example.findlostitemsapp.pages.post.Post.class);
+        startActivity(intent);
+    }
+
+    private void openSearch() {
+        Intent intent = new Intent(Home.this, SearchActivity.class);
+        startActivity(intent);
+    }
+
+    private boolean openHome() {
+        return true;
     }
 }

@@ -15,6 +15,15 @@
         android:theme="@style/Theme.FindLostItemsApp"
         tools:targetApi="31">
         <activity
+            android:name=".pages.profile.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".pages.notification.NotificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".pages.search.SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".pages.post.PostDetailActivity"
             android:exported="false" />
         <activity

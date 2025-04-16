@@ -1,4 +1,4 @@
-package com.example.findlostitemsapp.pages.post;
+package com.example.findlostitemsapp.pages.notification;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.pages.home.Home;
-import com.example.findlostitemsapp.pages.notification.NotificationActivity;
+import com.example.findlostitemsapp.pages.post.Post;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -22,12 +22,12 @@ import com.google.android.material.navigation.NavigationBarView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Post extends AppCompatActivity {
+public class NotificationActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post);
+        setContentView(R.layout.activity_notification);
 
         initUi();
 
@@ -35,7 +35,7 @@ public class Post extends AppCompatActivity {
     }
 
     private void bottomNavigationBarAction() {
-        bottomNav.setSelectedItemId(R.id.nav_post);
+        bottomNav.setSelectedItemId(R.id.nav_notifications);
         Map<Integer, Runnable> menuActions = new HashMap<>();
         menuActions.put(R.id.nav_home, () -> openHome());
         menuActions.put(R.id.nav_search, () -> openSearch());
@@ -58,26 +58,26 @@ public class Post extends AppCompatActivity {
     }
 
     private void openProfile() {
-        Intent intent = new Intent(Post.this, ProfileActivity.class);
+        Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
         startActivity(intent);
     }
 
-    private void openNotification() {
-        Intent intent = new Intent(Post.this, NotificationActivity.class);
-        startActivity(intent);
-    }
-
-    private boolean openPost() {
+    private boolean openNotification() {
         return true;
     }
 
+    private void openPost() {
+        Intent intent = new Intent(NotificationActivity.this, Post.class);
+        startActivity(intent);
+    }
+
     private void openHome() {
-        Intent intent = new Intent(Post.this, Home.class);
+        Intent intent = new Intent(NotificationActivity.this, Home.class);
         startActivity(intent);
     }
 
     private void openSearch() {
-        Intent intent = new Intent(Post.this, SearchActivity.class);
+        Intent intent = new Intent(NotificationActivity.this, SearchActivity.class);
         startActivity(intent);
     }
 
