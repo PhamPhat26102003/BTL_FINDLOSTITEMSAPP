@@ -94,7 +94,7 @@
         <ImageView
             android:layout_width="45dp"
             android:layout_height="45dp"
-            android:src="@drawable/facebook_icon"
+            android:src="@drawable/facebookbig"
             android:background="@drawable/bg_circle_border"
             android:padding="6dp"
             android:layout_marginBottom="6dp" />

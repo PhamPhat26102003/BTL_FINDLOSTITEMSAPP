@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.model.Post;
 import com.example.findlostitemsapp.pages.login.Login;
+import com.example.findlostitemsapp.pages.post.PostDetailActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -149,6 +150,12 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
 
     @Override
     public void onPostClick(Post post) {
-        Toast.makeText(this, "Xem chi tiết bài đăng: " + post.getTitle(), Toast.LENGTH_SHORT).show();
+        gotoPostDetailActivity(post);
+    }
+
+    private void gotoPostDetailActivity(Post post) {
+        Intent intent = new Intent(Home.this, PostDetailActivity.class);
+        intent.putExtra("post_data",post);
+        startActivity(intent);
     }
 }
