@@ -2,9 +2,11 @@ package com.example.findlostitemsapp.pages.register;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,11 +35,13 @@ public class Register extends AppCompatActivity {
     EditText editTextEmail, editTextPassword, editTextRePassword, editTextPhone, editTextFirstName, editTextLastName, editTextAddress;
     Button btnRegister;
     FirebaseAuth mAuth;
+    ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        progressBar = findViewById(R.id.progressBar);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextRePassword = findViewById(R.id.editTextRePassword);
@@ -57,10 +61,10 @@ public class Register extends AppCompatActivity {
                 goToLoginActivity();
             }
         });
-
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String email = String.valueOf(editTextEmail.getText());
                 String password = String.valueOf(editTextPassword.getText());
                 String firstname = String.valueOf(editTextFirstName.getText());
@@ -70,40 +74,49 @@ public class Register extends AppCompatActivity {
                 String repassword = String.valueOf(editTextRePassword.getText());
                 Integer postsCount = 0;
                 String profileImg = "";
-                if (password.equals(repassword)) {
-                    mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        // Đăng ký thành công
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        String userId = user.getUid();  // Lấy ID người dùng
 
-                                        // Tạo đối tượng User để lưu vào database
-                                        User newUser = new User(userId,postsCount,address,phone,profileImg,email,lastname,firstname);
+                progressBar.setVisibility(View.VISIBLE);
+                new Handler().postDelayed(()->{
+                    if (password.equals(repassword)) {
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            // Đăng ký thành công
+                                            FirebaseUser user = mAuth.getCurrentUser();
+                                            String userId = user.getUid();  // Lấy ID người dùng
 
-                                        // Lưu đối tượng User vào Firebase Realtime Database
-                                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-                                        usersRef.child(userId).setValue(newUser)
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if (task.isSuccessful()) {
-                                                            Toast.makeText(Register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                                                        } else {
-                                                            Toast.makeText(Register.this, "Lưu thông tin thất bại", Toast.LENGTH_SHORT).show();
+                                            // Tạo đối tượng User để lưu vào database
+                                            User newUser = new User(userId,postsCount,address,phone,profileImg,email,lastname,firstname);
+
+                                            // Lưu đối tượng User vào Firebase Realtime Database
+                                            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+                                            usersRef.child(userId).setValue(newUser)
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                Toast.makeText(Register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                                                                progressBar.setVisibility(View.GONE);
+                                                            } else {
+                                                                Toast.makeText(Register.this, "Lưu thông tin thất bại", Toast.LENGTH_SHORT).show();
+                                                                progressBar.setVisibility(View.GONE);
+                                                            }
                                                         }
-                                                    }
-                                                });
-                                    } else {
-                                        Toast.makeText(Register.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                    });
+                                        } else {
+                                            Toast.makeText(Register.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                            progressBar.setVisibility(View.GONE);
+                                        }
                                     }
-                                }
-                            });
-                } else {
-                    Toast.makeText(Register.this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
-                }
+                                });
+                    } else {
+                        Toast.makeText(Register.this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                },2000);
+
             }
         });
     }
