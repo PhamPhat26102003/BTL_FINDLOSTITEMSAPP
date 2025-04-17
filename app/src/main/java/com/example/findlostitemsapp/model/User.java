@@ -5,20 +5,26 @@ import java.util.Map;
 
 public class User {
     private String userId;
-    private String username;
+    private String firstName;
+    private String lastName;
     private String email;
+    private String password;
     private String phoneNumber;
     private String profileImageUrl;
+    private String address;
     private int postsCount; // Số bài đăng đã tạo
 
     // Thêm phương thức để chuyển đổi thành Map cho Firebase
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("userId", userId);
-        result.put("username", username);
+        result.put("firstname", firstName);
+        result.put("lastname", lastName);
         result.put("email", email);
+        result.put("password", password);
         result.put("phoneNumber", phoneNumber);
         result.put("profileImageUrl", profileImageUrl);
+        result.put("address", address);
         result.put("postsCount", postsCount);
         return result;
     }
@@ -28,15 +34,17 @@ public class User {
         // Constructor mặc định cần thiết cho Firebase
     }
 
-    public User(String userId, String username, String email, String phoneNumber) {
+    public User(String userId, int postsCount, String address, String phoneNumber, String profileImageUrl, String email,String lastName, String firstName) {
         this.userId = userId;
-        this.username = username;
-        this.email = email;
+        this.postsCount = postsCount;
+        this.address = address;
         this.phoneNumber = phoneNumber;
-        this.postsCount = 0;
+        this.profileImageUrl = profileImageUrl;
+        this.email = email;
+        this.lastName = lastName;
+        this.firstName = firstName;
     }
 
-    // Getters and Setters
     public String getUserId() {
         return userId;
     }
@@ -45,12 +53,20 @@ public class User {
         this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -59,6 +75,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPhoneNumber() {
@@ -75,6 +99,14 @@ public class User {
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public int getPostsCount() {

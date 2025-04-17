@@ -2,14 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_profile"
+        android:visible="false"
         android:title="Trang cá nhân" />
     <item
         android:id="@+id/menu_history"
+        android:visible="false"
         android:title="Lịch sử đăng bài" />
     <item
         android:id="@+id/menu_settings"
+        android:visible="false"
         android:title="Cài đặt" />
     <item
+        android:id="@+id/menu_login"
+        android:title="Đăng nhập" />
+    <item
+        android:id="@+id/menu_register"
+        android:title="Đăng ký" />
+    <item
         android:id="@+id/menu_logout"
+        android:visible="false"
         android:title="Đăng xuất" />
 </menu>
