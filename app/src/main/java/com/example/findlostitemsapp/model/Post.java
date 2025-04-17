@@ -1,11 +1,12 @@
 package com.example.findlostitemsapp.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Post {
+public class Post implements Serializable {
     private String postId;
     private String userId;
     private String title;
@@ -18,6 +19,7 @@ public class Post {
     private boolean isFound; // Đã tìm thấy chưa
     private String contactInfo;
     private String tag;
+    private int viewCount;
 
     // Thêm phương thức để chuyển đổi thành Map cho Firebase
     public Map<String, Object> toMap() {
@@ -34,6 +36,7 @@ public class Post {
         result.put("isFound", isFound);
         result.put("contactInfo", contactInfo);
         result.put("tag", tag);
+        result.put("viewCount", viewCount);
         return result;
     }
 
@@ -52,6 +55,7 @@ public class Post {
         post.setIsFound((Boolean) map.get("isFound"));
         post.setContactInfo((String) map.get("contactInfo"));
         post.setTag((String) map.get("tag"));
+        post.setTag(String.valueOf((int) map.get("viewCount")));
         return post;
     }
 
@@ -62,7 +66,7 @@ public class Post {
         // Constructor mặc định cần thiết cho Firebase
     }
 
-    public Post(String postId, String userId, String title, String description, String itemCategory, String location, String lostDate, String postDate, List<String> imageUrls, boolean isFound, String contactInfo, String tag) {
+    public Post(String postId, String userId, String title, String description, String itemCategory, String location, String lostDate, String postDate, List<String> imageUrls, boolean isFound, String contactInfo, String tag, int viewCount) {
         this.postId = postId;
         this.userId = userId;
         this.title = title;
@@ -75,6 +79,7 @@ public class Post {
         this.isFound = isFound;
         this.contactInfo = contactInfo;
         this.tag = tag;
+        this.viewCount = viewCount;
     }
 
     public String getPostId() {
@@ -171,5 +176,12 @@ public class Post {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
     }
 }

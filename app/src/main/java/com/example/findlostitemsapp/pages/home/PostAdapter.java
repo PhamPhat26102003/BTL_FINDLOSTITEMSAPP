@@ -81,7 +81,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.tvTagHighlight.setVisibility(View.GONE);
         }
 
-        holder.tvViews.setText("👁 1 lượt xem"); // Cần cải thiện nếu có trường views
+        holder.tvViews.setText("👁 " +post.getViewCount()+ " lượt xem"); // Cần cải thiện nếu có trường views
 
         long currentTime = System.currentTimeMillis();
         // Chuyển đổi postDate từ String thành Date để tính toán
@@ -116,6 +116,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             // Nếu lỗi, hiển thị ngày hiện tại
             holder.tvPostDate.setText("📅 " + dateFormat.format(new Date()));
         }
+        holder.itemView.setOnClickListener(v -> {
+            if (onPostClickListener != null) {
+                onPostClickListener.onPostClick(post);
+            }
+        });
     }
 
     @Override
