@@ -50,6 +50,13 @@
             android:textColor="#8000FF"
             android:textSize="14sp"
             android:layout_marginBottom="16dp" />
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content" />
 
         <!-- Form gồm 2 ô trên 1 hàng -->
         <GridLayout
@@ -74,6 +81,7 @@
                     android:textSize="14sp"
                     android:textColor="#000000" />
                 <EditText
+                    android:id="@+id/editFirstName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Họ của bạn"
@@ -95,6 +103,7 @@
                     android:textSize="14sp"
                     android:textColor="#000000" />
                 <EditText
+                    android:id="@+id/editLastName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Tên của bạn"
@@ -117,6 +126,7 @@
                     android:textSize="14sp"
                     android:textColor="#000000" />
                 <EditText
+                    android:id="@+id/editTextPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="(+84) hoặc 0xxx"
@@ -140,6 +150,7 @@
                     android:textSize="14sp"
                     android:textColor="#000000" />
                 <EditText
+                    android:id="@+id/editAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Nhập địa chỉ"
@@ -156,6 +167,7 @@
             android:textSize="14sp"
             android:textColor="#000000" />
         <EditText
+            android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="abc@gmail.com"
@@ -172,6 +184,7 @@
             android:textSize="14sp"
             android:textColor="#000000" />
         <EditText
+            android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="********"
@@ -182,12 +195,14 @@
 
         <!-- Nhập lại mật khẩu -->
         <TextView
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nhập lại mật khẩu"
             android:textSize="14sp"
             android:textColor="#000000" />
         <EditText
+            android:id="@+id/editTextRePassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="********"
@@ -200,11 +215,10 @@
         <Button
             style="@style/CustomButton"
             android:id="@+id/btnRegister"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Đăng kí"
             android:layout_gravity="left"
-            android:layout_marginLeft="15dp"
             android:textColor="#FFFFFF"
             android:background="@drawable/bg_btn_gradient"
             android:layout_marginBottom="12dp" />

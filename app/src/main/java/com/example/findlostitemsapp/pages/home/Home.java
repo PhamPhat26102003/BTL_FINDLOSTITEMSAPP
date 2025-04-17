@@ -1,10 +1,11 @@
 package com.example.findlostitemsapp.pages.home;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.MenuItem;
+import android.view.MenuItem
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,11 +82,14 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
             ContextThemeWrapper wrapper = new ContextThemeWrapper(Home.this, R.style.PopupMenuStyle);
             PopupMenu popupMenu = new PopupMenu(wrapper, view);
             popupMenu.getMenuInflater().inflate(R.menu.account_dropdown_menu, popupMenu.getMenu());
+            Menu menu = popupMenu.getMenu();
             Map<Integer, Runnable> menuActions = new HashMap<>();
-            //            menuActions.put(R.id.menu_profile, () -> openProfile());
-//            menuActions.put(R.id.menu_history, () -> openHistory());
-//            menuActions.put(R.id.menu_settings, () -> openSettings());
+            menuActions.put(R.id.menu_login, () -> login());
+            menuActions.put(R.id.menu_register, () -> register());
             menuActions.put(R.id.menu_logout, () -> logout());
+//                menuActions.put(R.id.menu_profile, () -> openProfile());
+//                menuActions.put(R.id.menu_history, () -> openHistory());
+//                menuActions.put(R.id.menu_settings, () -> openSettings());
             popupMenu.setOnMenuItemClickListener(item -> {
                 Runnable action = menuActions.get(item.getItemId());
                 if (action != null) {
@@ -95,6 +99,26 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
                 return false;
             });
             popupMenu.show();
+            //lay ra data tuy y tu ben Login nhe
+            SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+            //lay nhu nay
+            boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+            if (isLoggedIn) {
+                menu.findItem(R.id.menu_login).setVisible(false);
+                menu.findItem(R.id.menu_register).setVisible(false);
+                menu.findItem(R.id.menu_profile).setVisible(true);
+                menu.findItem(R.id.menu_history).setVisible(true);
+                menu.findItem(R.id.menu_settings).setVisible(true);
+                menu.findItem(R.id.menu_logout).setVisible(true);
+            } else {
+                // Chuyển về màn hình đăng nhập
+                menu.findItem(R.id.menu_login).setVisible(true);
+                menu.findItem(R.id.menu_register).setVisible(true);
+                menu.findItem(R.id.menu_profile).setVisible(false);
+                menu.findItem(R.id.menu_history).setVisible(false);
+                menu.findItem(R.id.menu_settings).setVisible(false);
+                menu.findItem(R.id.menu_logout).setVisible(false);
+            }
         });
 
         bottomNavigationBarAction();
@@ -185,8 +209,27 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
 
 
     private void logout() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear(); // hoặc remove từng cái nếu cần
+        editor.apply();
+        FirebaseAuth.getInstance().signOut(); // Logout Firebase
+
         Intent intent = new Intent(Home.this, Login.class);
         intent.putExtra("LOGGED_OUT", true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+    private void register() {
+        Intent intent = new Intent(Home.this, Register.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void login() {
+        Intent intent = new Intent(Home.this, Login.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

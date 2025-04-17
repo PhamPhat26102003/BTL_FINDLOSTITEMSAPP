@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.glide.v4151)
     implementation(platform(libs.firebase.bom))
     implementation(libs.glide)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

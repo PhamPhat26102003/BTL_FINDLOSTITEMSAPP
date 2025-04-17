@@ -13,6 +13,7 @@
         android:gravity="center_horizontal">
 
         <!-- Breadcrumb -->
+
         <TextView
             android:id="@+id/textBreadcrumb"
             android:layout_width="wrap_content"
@@ -76,6 +77,13 @@
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content" />
         <!-- Email -->
         <EditText
             android:id="@+id/editTextEmail"
@@ -89,6 +97,7 @@
             android:layout_marginBottom="12dp" />
 
         <!-- Password -->
+
         <EditText
             android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
@@ -104,11 +113,10 @@
         <Button
             style="@style/CustomButton"
             android:id="@+id/btnLogin"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Đăng nhập"
             android:layout_marginTop="1dp"
-            android:layout_marginLeft="19dp"
             android:layout_gravity="left"
             android:textColor="#FFFFFF"
             android:background="@drawable/bg_btn_gradient"
@@ -170,7 +178,17 @@
                 android:text="Facebook"
                 android:textColor="#FFFFFF"
                 android:background="@drawable/bg_social_facebook_button" />
+
         </LinearLayout>
+        <TextView
+            android:id="@+id/textHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trở về trang chủ"
+            android:layout_marginTop="5dp"
+            android:textColor="#8000FF"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
