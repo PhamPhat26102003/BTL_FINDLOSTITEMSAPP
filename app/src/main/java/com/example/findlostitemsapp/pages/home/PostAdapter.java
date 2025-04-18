@@ -161,4 +161,5 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             tvViewDetails = itemView.findViewById(R.id.tvViewDetails);
         }
     }
+
 }
