@@ -24,6 +24,7 @@ import com.example.findlostitemsapp.pages.notification.NotificationActivity;
 import com.example.findlostitemsapp.pages.post.PostDetailActivity;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
+import com.example.findlostitemsapp.pages.settings.SettingActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
@@ -89,7 +90,7 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
             menuActions.put(R.id.menu_logout, () -> logout());
 //                menuActions.put(R.id.menu_profile, () -> openProfile());
 //                menuActions.put(R.id.menu_history, () -> openHistory());
-//                menuActions.put(R.id.menu_settings, () -> openSettings());
+            menuActions.put(R.id.menu_settings, () -> openSettings());
             popupMenu.setOnMenuItemClickListener(item -> {
                 Runnable action = menuActions.get(item.getItemId());
                 if (action != null) {
@@ -124,6 +125,7 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
         bottomNavigationBarAction();
 
     }
+
 
     private void bottomNavigationBarAction() {
         Map<Integer, Runnable> menuActions = new HashMap<>();
@@ -245,7 +247,10 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
         intent.putExtra("post_data", post);
         startActivity(intent);
     }
-
+    private void openSettings() {
+        Intent intent = new Intent(Home.this, SettingActivity.class);
+        startActivity(intent);
+    }
     private void openProfile() {
         Intent intent = new Intent(Home.this, ProfileActivity.class);
         startActivity(intent);

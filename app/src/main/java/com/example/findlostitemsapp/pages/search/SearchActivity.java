@@ -78,10 +78,10 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         adapterTinhThanh = new CustomSpinnerAdapter(this, listTinhThanh, spinnerTinhThanh);
         spinnerTinhThanh.setAdapter(adapterTinhThanh);
 
-        loadSpinnerData("post_types", listLoaiBaiViet, adapterLoaiBaiViet, "Loại bài viết");
-        loadSpinnerData("categories", listDanhMuc, adapterDanhMuc, "Danh mục");
+        loadSpinnerData("tag", listLoaiBaiViet, adapterLoaiBaiViet, "Loại bài viết");
+        loadSpinnerData("itemCategory", listDanhMuc, adapterDanhMuc, "Danh mục");
         loadSpinnerData("time_filters", listThoiGian, adapterThoiGian, "Thời gian");
-        loadSpinnerData("locations", listTinhThanh, adapterTinhThanh, "Tỉnh/Thành phố");
+        loadSpinnerData("location", listTinhThanh, adapterTinhThanh, "Tỉnh/Thành phố");
 
 
         // Khởi tạo RecyclerView và PostAdapter
