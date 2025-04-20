@@ -5,7 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.MenuItem
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,11 +23,14 @@ import com.example.findlostitemsapp.model.Post;
 import com.example.findlostitemsapp.pages.login.Login;
 import com.example.findlostitemsapp.pages.notification.NotificationActivity;
 import com.example.findlostitemsapp.pages.post.PostDetailActivity;
+import com.example.findlostitemsapp.pages.post.PostsActivity;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
+import com.example.findlostitemsapp.pages.register.Register;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -257,7 +261,7 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
     }
 
     private void openPost() {
-        Intent intent = new Intent(Home.this, com.example.findlostitemsapp.pages.post.Post.class);
+        Intent intent = new Intent(Home.this, PostsActivity.class);
         startActivity(intent);
     }
 
