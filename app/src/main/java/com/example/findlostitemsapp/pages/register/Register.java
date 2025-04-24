@@ -99,6 +99,7 @@ public class Register extends AppCompatActivity {
                                                             if (task.isSuccessful()) {
                                                                 Toast.makeText(Register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                                                                 progressBar.setVisibility(View.GONE);
+                                                                goToLoginActivity();
                                                             } else {
                                                                 Toast.makeText(Register.this, "Lưu thông tin thất bại", Toast.LENGTH_SHORT).show();
                                                                 progressBar.setVisibility(View.GONE);
