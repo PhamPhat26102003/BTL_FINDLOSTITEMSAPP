@@ -1,0 +1,109 @@
+[33mcommit 8f052ea864c4d6c2bd6e9359f93c9a584b5b8196[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mPhuong[m[33m)[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Fri Apr 18 22:40:47 2025 +0700
+
+    Logic SearchActivity
+
+[33mcommit 23c83b5e3be70065bb74c5f2ccd96077c74773e0[m
+Merge: feb95f0 75f001f
+Author: PhamPhat26102003 <164967888+PhamPhat26102003@users.noreply.github.com>
+Date:   Thu Apr 17 18:41:17 2025 +0700
+
+    Merge branch 'Phuong' into dev
+
+[33mcommit 75f001fa90f1225494c5724b27fa53391b161f54[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Thu Apr 17 11:50:39 2025 +0700
+
+    UI Search
+
+[33mcommit feb95f093d0302a82d4fb860ecc907c188218261[m
+Merge: 397077b ab7368b
+Author: amber <156265001+nghiemvanmanh@users.noreply.github.com>
+Date:   Thu Apr 17 10:52:43 2025 +0700
+
+    Merge pull request #3 from PhamPhat26102003/manh/accounts
+    
+    Manh/accounts
+
+[33mcommit ab7368b88e85068c10a0c829c2afd5dae06ee463[m[33m ([m[1;31morigin/manh/accounts[m[33m)[m
+Author: nghiemvanmanh <nvmanhfc2003@gmail.com>
+Date:   Thu Apr 17 10:51:14 2025 +0700
+
+    feat: Update Login and Register to Firebase
+
+[33mcommit 3217ecfab1d374673468c0a5604212acaf4cdadb[m
+Author: nghiemvanmanh <nvmanhfc2003@gmail.com>
+Date:   Thu Apr 17 01:56:13 2025 +0700
+
+    feat: Update Login and Register to Firebase
+
+[33mcommit 446da8603c34d7f2d40418fe60539eec429d6ae3[m
+Author: nghiemvanmanh <nvmanhfc2003@gmail.com>
+Date:   Thu Apr 17 01:55:26 2025 +0700
+
+    feat: Update Login and Register to Firebase
+
+[33mcommit 383b64aa2009cab14fe8e094a67206aa343492b6[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Wed Apr 16 17:41:43 2025 +0700
+
+    Click chuyển màn BottomNavigationView
+    (tạo UI trên form đã làm, nhớ giữ lại BottomNavigationView)
+
+[33mcommit cf9a92cc9b0a95be3e61d960c0f27c24020429a9[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Wed Apr 16 15:14:44 2025 +0700
+
+    UI PostDetailActivity and setData
+
+[33mcommit 397077be6cebdf0b20b7e34a24b4e647f74af519[m
+Merge: 8c9115c e031df1
+Author: PhamPhat26102003 <164967888+PhamPhat26102003@users.noreply.github.com>
+Date:   Tue Apr 15 21:21:55 2025 +0700
+
+    Merge pull request #2 from PhamPhat26102003/Phuong
+    
+    Phuong
+
+[33mcommit e031df1916f44cd2dfe13c786eb0cc94164ca7d3[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Tue Apr 15 13:14:28 2025 +0700
+
+    fix PostDate
+
+[33mcommit b456587b2ed69d941f06a24e7a642206c41736e5[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Mon Apr 14 22:53:48 2025 +0700
+
+    Hiện danh sách bài đăng
+
+[33mcommit c6ae9785604665acf939f22562c74c9d53e7ca8f[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Sun Apr 13 15:24:24 2025 +0700
+
+    UI Login Logout
+    Intent: Home(Đăng xuất)->Login
+    Login(Bạn chưa có tài khoản,đăngkis)->Register
+    Register(Bạn đã có tài khoản,đăng nhập)->Login
+
+[33mcommit 8c9115cca56c2a9a7c72de25b359a8f6e5753300[m
+Merge: f687e87 ecfdf4e
+Author: PhamPhat26102003 <164967888+PhamPhat26102003@users.noreply.github.com>
+Date:   Sat Apr 12 09:22:14 2025 +0700
+
+    Merge pull request #1 from PhamPhat26102003/Phuong
+    
+    UI Home
+
+[33mcommit ecfdf4e3b20ba8ea4cb8e08e2c4117be13f537b3[m
+Author: NorthPg <phuongn20122003@gmail.com>
+Date:   Fri Apr 11 21:22:20 2025 +0700
+
+    UI Home
+
+[33mcommit f687e873ae9d16f6135ce1bdc8d347977d755807[m
+Author: Pham Phat <phamphat261023@gmail.com>
+Date:   Thu Apr 10 11:48:36 2025 +0700
+
+    btl findlostitemapp
