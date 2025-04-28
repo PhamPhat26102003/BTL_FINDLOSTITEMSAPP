@@ -1,6 +1,7 @@
 package com.example.findlostitemsapp.pages.register;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class Register extends AppCompatActivity {
 
+    private static final String PREFS_NAME = "UserSession";
     private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/4975/4975733.png";
     private static final int MIN_PASSWORD_LENGTH = 6;
 
@@ -32,6 +34,7 @@ public class Register extends AppCompatActivity {
     private Button btnRegister;
     private TextView textBreadcrumb, textLogin;
     private ProgressBar progressBar;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class Register extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         auth = FirebaseAuth.getInstance();
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         initializeUi();
         setupListeners();
     }
@@ -56,7 +60,7 @@ public class Register extends AppCompatActivity {
         textBreadcrumb = findViewById(R.id.textBreadcrumb);
         textLogin = findViewById(R.id.textLogin);
 
-        UiUtils.setColoredSpan(textBreadcrumb, "🏠 Trang chủ > Đăng nhập", "Trang chủ", "#00D46F");
+        UiUtils.setColoredSpan(textBreadcrumb, "🏠 Trang chủ > Đăng ký", "Trang chủ", "#00D46F");
     }
 
     private void setupListeners() {
@@ -134,8 +138,22 @@ public class Register extends AppCompatActivity {
     }
 
     private void saveUserToDatabase(String userId, String email, String firstName, String lastName, String phone, String address) {
+        // Tạo userName từ firstName và lastName
+        String userName = firstName + " " + lastName;
+
+        // Tạo đối tượng User
         User newUser = new User(userId, 0, address, phone, DEFAULT_PROFILE_IMAGE, email, lastName, firstName);
+
+        // Lưu thông tin vào Firebase Database
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+        usersRef.child("userName").setValue(userName);
+        usersRef.child("email").setValue(email);
+        usersRef.child("firstName").setValue(firstName);
+        usersRef.child("lastName").setValue(lastName);
+        usersRef.child("phoneNumber").setValue(phone);
+        usersRef.child("address").setValue(address);
+        usersRef.child("profileImage").setValue(DEFAULT_PROFILE_IMAGE);
+        usersRef.child("role").setValue(0);
 
         usersRef.setValue(newUser)
                 .addOnCompleteListener(task -> {
@@ -143,12 +161,27 @@ public class Register extends AppCompatActivity {
                     btnRegister.setEnabled(true);
 
                     if (task.isSuccessful()) {
+                        // Lưu userName vào SharedPreferences
+                        saveUserSession(userName, firstName, lastName, email, phone, address);
                         showToast("Đăng ký thành công!");
                         navigateToLogin();
                     } else {
                         showError("Lưu thông tin thất bại: " + task.getException().getMessage());
                     }
                 });
+    }
+
+    private void saveUserSession(String userName, String firstName, String lastName, String email, String phone, String address) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("userName", userName);
+        editor.putString("firstName", firstName);
+        editor.putString("lastName", lastName);
+        editor.putString("email", email);
+        editor.putString("phone", phone);
+        editor.putString("address", address);
+        editor.putString("loginMethod", "email");
+        editor.putBoolean("isLoggedIn", true);
+        editor.apply();
     }
 
     private void navigateToLogin() {

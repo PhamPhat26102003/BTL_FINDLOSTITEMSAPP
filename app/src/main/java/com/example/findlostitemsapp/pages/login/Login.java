@@ -147,7 +147,14 @@ public class Login extends AppCompatActivity {
                     String phone = snapshot.child("phoneNumber").getValue(String.class);
                     String address = snapshot.child("address").getValue(String.class);
 
-                    saveUserSession(firstName, lastName, email, phone, address, LOGIN_METHOD_EMAIL);
+                    // Tạo userName từ firstName và lastName
+                    String userName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                    userName = userName.trim();
+                    if (userName.isEmpty()) {
+                        userName = "Người dùng ẩn danh";
+                    }
+
+                    saveUserSession(userName, firstName, lastName, email, phone, address, LOGIN_METHOD_EMAIL);
                     navigateToActivity(Home.class);
                 } else {
                     showError("Không tìm thấy thông tin người dùng!");
@@ -174,14 +181,14 @@ public class Login extends AppCompatActivity {
             Task<com.google.android.gms.auth.api.signin.GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 com.google.android.gms.auth.api.signin.GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account.getIdToken());
+                firebaseAuthWithGoogle(account.getIdToken(), account.getDisplayName(), account.getEmail());
             } catch (ApiException e) {
                 showError("Đăng nhập Google thất bại: " + e.getMessage());
             }
         }
     }
 
-    private void firebaseAuthWithGoogle(String idToken) {
+    private void firebaseAuthWithGoogle(String idToken, String displayName, String email) {
         progressBar.setVisibility(View.VISIBLE);
         btnGoogleLogin.setEnabled(false);
 
@@ -191,7 +198,13 @@ public class Login extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null) {
-                            saveGoogleUserSession(user.getEmail());
+                            // Lưu thông tin người dùng vào Firebase Database
+                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+                            String userName = displayName != null && !displayName.isEmpty() ? displayName : "Người dùng ẩn danh";
+                            userRef.child("userName").setValue(userName);
+                            userRef.child("email").setValue(email);
+
+                            saveGoogleUserSession(userName, email);
                             navigateToActivity(Home.class);
                         } else {
                             showError("Không thể lấy thông tin người dùng");
@@ -202,8 +215,9 @@ public class Login extends AppCompatActivity {
                 });
     }
 
-    private void saveUserSession(String firstName, String lastName, String email, String phone, String address, String loginMethod) {
+    private void saveUserSession(String userName, String firstName, String lastName, String email, String phone, String address, String loginMethod) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("userName", userName);
         editor.putString("firstName", firstName);
         editor.putString("lastName", lastName);
         editor.putString("email", email);
@@ -214,8 +228,9 @@ public class Login extends AppCompatActivity {
         editor.apply();
     }
 
-    private void saveGoogleUserSession(String email) {
+    private void saveGoogleUserSession(String userName, String email) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("userName", userName);
         editor.putString("email", email);
         editor.putString("loginMethod", LOGIN_METHOD_GOOGLE);
         editor.putBoolean("isLoggedIn", true);

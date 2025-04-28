@@ -1,7 +1,7 @@
 package com.example.findlostitemsapp.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,17 +11,16 @@ public class Post implements Serializable {
     private String userId;
     private String title;
     private String description;
-    private String itemCategory; // Danh mục đồ vật
-    private String location; // Địa điểm mất/địa điểm nhặt được
-    private String lostDate; // Ngày mất
-    private String postDate; // Ngày đăng bài
-    private List<String> imageUrls; // Danh sách URL hình ảnh
-    private boolean isFound; // Đã tìm thấy chưa
+    private String itemCategory;
+    private String location;
+    private String lostDate;
+    private String postDate;
+    private List<String> imageUrls;
+    private boolean isFound;
     private String contactInfo;
     private String tag;
     private int viewCount;
 
-    // Thêm phương thức để chuyển đổi thành Map cho Firebase
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("postId", postId);
@@ -40,7 +39,6 @@ public class Post implements Serializable {
         return result;
     }
 
-    // hàm formmap lay du lieu
     public static Post fromMap(Map<String, Object> map) {
         Post post = new Post();
         post.setPostId((String) map.get("postId"));
@@ -51,19 +49,15 @@ public class Post implements Serializable {
         post.setLocation((String) map.get("location"));
         post.setLostDate((String) map.get("lostDate"));
         post.setPostDate(map.get("postDate") != null ? (String) map.get("postDate") : "");
-        post.setImageUrls((List<String>) map.get("imageUrls"));
-        post.setIsFound((Boolean) map.get("isFound"));
+        post.setImageUrls(map.get("imageUrls") != null ? (List<String>) map.get("imageUrls") : new ArrayList<>());
+        post.setIsFound(map.get("isFound") != null ? (Boolean) map.get("isFound") : false);
         post.setContactInfo((String) map.get("contactInfo"));
         post.setTag((String) map.get("tag"));
-        post.setTag(String.valueOf((int) map.get("viewCount")));
+        post.setViewCount(map.get("viewCount") != null ? ((Long) map.get("viewCount")).intValue() : 0);
         return post;
     }
 
-
-
-    // Constructors
     public Post() {
-        // Constructor mặc định cần thiết cho Firebase
     }
 
     public Post(String postId, String userId, String title, String description, String itemCategory, String location, String lostDate, String postDate, List<String> imageUrls, boolean isFound, String contactInfo, String tag, int viewCount) {
@@ -177,6 +171,7 @@ public class Post implements Serializable {
     public void setTag(String tag) {
         this.tag = tag;
     }
+
     public int getViewCount() {
         return viewCount;
     }

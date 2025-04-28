@@ -21,6 +21,10 @@ import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.model.Post;
 import com.example.findlostitemsapp.pages.home.Home;
 import com.example.findlostitemsapp.pages.home.PostAdapter;
+import com.example.findlostitemsapp.pages.notification.NotificationActivity;
+import com.example.findlostitemsapp.pages.post.PostDetailActivity;
+import com.example.findlostitemsapp.pages.post.PostsActivity;
+import com.example.findlostitemsapp.pages.profile.ProfileActivity;
 import com.example.findlostitemsapp.pages.post.PostDetailActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
@@ -204,10 +208,25 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
                 }
             }
 
+    private void openProfile() {
+        Intent intent = new Intent(SearchActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    private void openNotification() {
+        Intent intent = new Intent(SearchActivity.this, NotificationActivity.class);
+        startActivity(intent);
+    }
+
+    private void openPost() {
+        Intent intent = new Intent(SearchActivity.this, PostsActivity.class);
+        startActivity(intent);
+    }
             // Tag filter
             if (!loaiBaiViet.isEmpty() && !post.getTag().equalsIgnoreCase(loaiBaiViet)) {
                 match = false;
             }
+
 
             // Category filter
             if (!danhMuc.isEmpty() && !post.getItemCategory().equalsIgnoreCase(danhMuc)) {
