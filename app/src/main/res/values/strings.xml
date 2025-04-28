@@ -14,4 +14,5 @@
     <string name="online_support">Hỗ trợ trực tuyến 24/7</string>
     <string name="congrats_found">Chúc mừng! Các bạn đã tìm thấy đồ</string>
     <string name="profile_sub">Cộng đồng tìm đồ và Trả lại</string>
+    <string name="login_profile">Bạn chưa đăng nhập!</string>
 </resources>
