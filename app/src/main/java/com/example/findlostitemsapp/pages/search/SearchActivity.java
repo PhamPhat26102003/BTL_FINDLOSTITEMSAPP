@@ -22,8 +22,8 @@ import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.pages.home.Home;
 import com.example.findlostitemsapp.pages.home.PostAdapter;
 import com.example.findlostitemsapp.pages.notification.NotificationActivity;
-import com.example.findlostitemsapp.pages.post.Post;
 import com.example.findlostitemsapp.pages.post.PostDetailActivity;
+import com.example.findlostitemsapp.pages.post.PostsActivity;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -188,7 +188,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
     }
 
     private void openPost() {
-        Intent intent = new Intent(SearchActivity.this, Post.class);
+        Intent intent = new Intent(SearchActivity.this, PostsActivity.class);
         startActivity(intent);
     }
 

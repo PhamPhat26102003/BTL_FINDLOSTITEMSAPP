@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Home extends AppCompatActivity implements PostAdapter.OnPostClickListener {
+    private static final int REQUEST_POST = 1003;
     FloatingActionButton fabToggle;
     LinearLayout socialButtons;
     private RecyclerView recyclerViewPosts;
@@ -162,7 +163,7 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
 
 
     private void loadPostsFromFirebase() {
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Post> tempList = new ArrayList<>();
@@ -260,8 +261,8 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
     }
 
     private void openPost() {
-        Intent intent = new Intent(Home.this, com.example.findlostitemsapp.pages.post.Post.class);
-        startActivity(intent);
+        Intent intent = new Intent(Home.this, com.example.findlostitemsapp.pages.post.PostsActivity.class);
+        startActivityForResult(intent, REQUEST_POST);
     }
 
     private void openSearch() {

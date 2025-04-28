@@ -15,11 +15,17 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.model.Post;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +34,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private List<Post> postList;
     private Context context;
     private OnPostClickListener onPostClickListener;
+    private HashMap<String, String> userNameCache;
+    private DatabaseReference usersRef;
+    private static final String[] DATE_FORMATS = {
+            "yyyy-MM-dd HH:mm:ss",
+            "dd/MM/yyyy"
+    };
 
     public interface OnPostClickListener {
         void onPostClick(Post post);
@@ -40,6 +52,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         this.context = context;
         this.postList = postList != null ? postList : new ArrayList<>();
         this.onPostClickListener = listener;
+        this.userNameCache = new HashMap<>();
+        this.usersRef = FirebaseDatabase.getInstance().getReference("users");
         setHasStableIds(true);
     }
 
@@ -81,41 +95,80 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.tvTagHighlight.setVisibility(View.GONE);
         }
 
-        holder.tvViews.setText("👁 " +post.getViewCount()+ " lượt xem"); // Cần cải thiện nếu có trường views
+        holder.tvViews.setText("👁 " + post.getViewCount() + " lượt xem");
 
+        // Xử lý postDate với nhiều định dạng
         long currentTime = System.currentTimeMillis();
-        // Chuyển đổi postDate từ String thành Date để tính toán
         String postDateStr = post.getPostDate();
-        long postTime = 0;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date postDate = sdf.parse(postDateStr); // Chuyển đổi String thành Date
-            postTime = postDate != null ? postDate.getTime() : currentTime; // Lấy thời gian theo dạng millis
-        } catch (ParseException e) {
-            postTime = currentTime; // Nếu lỗi thì dùng currentTime
+        long postTime = currentTime;
+        Date postDate = null;
+
+        for (String format : DATE_FORMATS) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+                postDate = sdf.parse(postDateStr);
+                if (postDate != null) {
+                    postTime = postDate.getTime();
+                    break;
+                }
+            } catch (ParseException e) {
+                Log.w("PostAdapter", "Không thể phân tích postDate: " + postDateStr + " với định dạng: " + format);
+            }
         }
 
-// Tính sự chênh lệch thời gian (số ngày đã trôi qua)
+        if (postDate == null) {
+            Log.e("PostAdapter", "Không thể phân tích postDate: " + postDateStr + ", sử dụng ngày hiện tại");
+            postDate = new Date();
+        }
+
         long diffInMillis = currentTime - postTime;
         long daysDiff = TimeUnit.MILLISECONDS.toDays(diffInMillis);
-// Hiển thị số ngày đã đăng
-        holder.tvTimeAgo.setText("🕒 " + daysDiff + " ngày trước");
 
-// Hiển thị thông tin liên lạc, địa điểm và vai trò
+        if (daysDiff == 0) {
+            holder.tvTimeAgo.setText("🕒 Hôm nay");
+        } else if (daysDiff == 1) {
+            holder.tvTimeAgo.setText("🕒 1 ngày trước");
+        } else {
+            holder.tvTimeAgo.setText("🕒 " + daysDiff + " ngày trước");
+        }
+
         holder.tvContact.setText("📞 " + post.getContactInfo());
         holder.tvLocation.setText("📍 " + post.getLocation());
-        holder.tvRole.setText("👤 Quản trị viên"); // Cần cải thiện nếu có trường role
 
-// Hiển thị ngày đăng bài dưới định dạng yyyy-MM-dd
-        // Hiển thị ngày đăng dưới dạng yyyy-MM-dd
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        try {
-            Date postDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(postDateStr);
-            holder.tvPostDate.setText("📅 " + dateFormat.format(postDate != null ? postDate : new Date()));
-        } catch (ParseException e) {
-            // Nếu lỗi, hiển thị ngày hiện tại
-            holder.tvPostDate.setText("📅 " + dateFormat.format(new Date()));
+        // Lấy và hiển thị tên người dùng
+        String userId = post.getUserId();
+        if (userId == null || userId.isEmpty()) {
+            holder.tvRole.setText("👤 Người dùng ẩn danh");
+            Log.w("PostAdapter", "userId null hoặc rỗng cho bài đăng: " + post.getPostId());
+        } else if (userNameCache.containsKey(userId)) {
+            holder.tvRole.setText("👤 " + userNameCache.get(userId));
+        } else {
+            usersRef.child(userId).child("userName").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String userName = snapshot.getValue(String.class);
+                    if (userName != null && !userName.isEmpty()) {
+                        userNameCache.put(userId, userName);
+                        holder.tvRole.setText("👤 " + userName);
+                    } else {
+                        userNameCache.put(userId, "Người dùng ẩn danh");
+                        holder.tvRole.setText("👤 Người dùng ẩn danh");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("PostAdapter", "Lỗi tải userName cho userId: " + userId, error.toException());
+                    userNameCache.put(userId, "Người dùng ẩn danh");
+                    holder.tvRole.setText("👤 Người dùng ẩn danh");
+                }
+            });
         }
+
+        // Hiển thị ngày đăng bài
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        holder.tvPostDate.setText("📅 " + dateFormat.format(postDate));
+
         holder.itemView.setOnClickListener(v -> {
             if (onPostClickListener != null) {
                 onPostClickListener.onPostClick(post);
@@ -138,7 +191,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         if (newPosts != null) {
             this.postList.addAll(newPosts);
         }
-        Log.d("PostAdapter", "Cập nhật danh sách bài đăng, kích thước: " + newPosts.size());
+        Log.d("PostAdapter", "Cập nhật danh sách bài đăng, kích thước: " + postList.size());
         notifyDataSetChanged();
     }
 
