@@ -1,5 +1,7 @@
 package com.example.findlostitemsapp.pages.notification;
 
+import static com.example.findlostitemsapp.pages.uiutils.UiUtils.setupBottomNavigation;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -31,35 +33,7 @@ public class NotificationActivity extends AppCompatActivity {
 
         initUi();
 
-        bottomNavigationBarAction();
-    }
-
-    private void bottomNavigationBarAction() {
-        bottomNav.setSelectedItemId(R.id.nav_notifications);
-        Map<Integer, Runnable> menuActions = new HashMap<>();
-        menuActions.put(R.id.nav_home, () -> openHome());
-        menuActions.put(R.id.nav_search, () -> openSearch());
-        menuActions.put(R.id.nav_post, () -> openPost());
-        menuActions.put(R.id.nav_notifications, () -> openNotification());
-        menuActions.put(R.id.nav_profile, () -> openProfile());
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                Runnable action = menuActions.get(item.getItemId());
-                if (action != null) {
-                    action.run();
-                    return true;
-                }
-                return false;
-
-            }
-        });
-    }
-
-    private void openProfile() {
-        Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
-        startActivity(intent);
+        setupBottomNavigation(this, bottomNav, R.id.nav_notifications);
     }
 
     private boolean openNotification() {

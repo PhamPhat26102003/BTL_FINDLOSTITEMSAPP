@@ -46,12 +46,13 @@
 
                     <!-- Ô nhập từ khóa -->
                     <EditText
+                        android:id="@+id/editTextSearch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Nhập từ khóa tìm kiếm"
+                        android:layout_marginBottom="12dp"
                         android:background="@drawable/bg_edittext"
-                        android:padding="12dp"
-                        android:layout_marginBottom="12dp" />
+                        android:hint="Nhập từ khóa tìm kiếm"
+                        android:padding="12dp" />
 
                     <!-- Spinner các loại lựa chọn -->
                     <Spinner

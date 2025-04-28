@@ -1,4 +1,5 @@
 package com.example.findlostitemsapp.pages.home;
+import static com.example.findlostitemsapp.pages.uiutils.UiUtils.setupBottomNavigation;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -125,30 +126,8 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
             }
         });
 
-        bottomNavigationBarAction();
+        setupBottomNavigation(this, bottomNav, R.id.nav_home);
 
-    }
-
-    private void bottomNavigationBarAction() {
-        Map<Integer, Runnable> menuActions = new HashMap<>();
-        menuActions.put(R.id.nav_home, () -> openHome());
-        menuActions.put(R.id.nav_search, () -> openSearch());
-        menuActions.put(R.id.nav_post, () -> openPost());
-        menuActions.put(R.id.nav_notifications, () -> openNotification());
-        menuActions.put(R.id.nav_profile, () -> openProfile());
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                Runnable action = menuActions.get(item.getItemId());
-                if (action != null) {
-                    action.run();
-                    return true;
-                }
-                return false;
-
-            }
-        });
     }
 
 
@@ -273,4 +252,5 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
     private boolean openHome() {
         return true;
     }
+
 }
