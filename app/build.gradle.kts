@@ -46,4 +46,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    implementation ("com.google.firebase:firebase-storage:20.1.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.10.0")
+
+    implementation ("com.github.bumptech.glide:glide:4.12.0") // Glide version, bạn có thể thay đổi nếu cần
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
 }

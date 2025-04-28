@@ -16,12 +16,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.pages.home.Home;
 import com.example.findlostitemsapp.pages.notification.NotificationActivity;
-import com.example.findlostitemsapp.pages.post.Post;
+import com.example.findlostitemsapp.pages.post.PostsActivity;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -379,7 +382,7 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SearchActivity.class));
                 return true;
             } else if (itemId == R.id.nav_post) {
-                startActivity(new Intent(this, Post.class));
+                startActivity(new Intent(this, PostsActivity.class));
                 return true;
             } else if (itemId == R.id.nav_notifications) {
                 startActivity(new Intent(this, NotificationActivity.class));
