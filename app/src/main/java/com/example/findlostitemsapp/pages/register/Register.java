@@ -2,7 +2,6 @@ package com.example.findlostitemsapp.pages.register;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,37 +9,41 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.findlostitemsapp.model.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.findlostitemsapp.R;
-import com.example.findlostitemsapp.pages.uiutils.UiUtils;
+import com.example.findlostitemsapp.model.User;
 import com.example.findlostitemsapp.pages.login.Login;
-import com.google.firebase.database.ValueEventListener;
+import com.example.findlostitemsapp.pages.uiutils.UiUtils;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Register extends AppCompatActivity {
 
-    TextView textBreadcrumb, textLogin;
-    EditText editTextEmail, editTextPassword, editTextRePassword, editTextPhone, editTextFirstName, editTextLastName, editTextAddress;
-    Button btnRegister;
-    FirebaseAuth mAuth;
-    ProgressBar progressBar;
+    private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/4975/4975733.png";
+    private static final int MIN_PASSWORD_LENGTH = 6;
+
+    private FirebaseAuth auth;
+    private EditText editTextEmail, editTextPassword, editTextRePassword, editTextPhone;
+    private EditText editTextFirstName, editTextLastName, editTextAddress;
+    private Button btnRegister;
+    private TextView textBreadcrumb, textLogin;
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        auth = FirebaseAuth.getInstance();
+        initializeUi();
+        setupListeners();
+    }
+
+    private void initializeUi() {
         progressBar = findViewById(R.id.progressBar);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -52,78 +55,116 @@ public class Register extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         textBreadcrumb = findViewById(R.id.textBreadcrumb);
         textLogin = findViewById(R.id.textLogin);
+
         UiUtils.setColoredSpan(textBreadcrumb, "🏠 Trang chủ > Đăng nhập", "Trang chủ", "#00D46F");
-
-        mAuth = FirebaseAuth.getInstance();
-        textLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToLoginActivity();
-            }
-        });
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String email = String.valueOf(editTextEmail.getText());
-                String password = String.valueOf(editTextPassword.getText());
-                String firstname = String.valueOf(editTextFirstName.getText());
-                String lastname = String.valueOf(editTextLastName.getText());
-                String address = String.valueOf(editTextAddress.getText());
-                String phone = String.valueOf(editTextPhone.getText());
-                String repassword = String.valueOf(editTextRePassword.getText());
-                Integer postsCount = 0;
-                String profileImg = "";
-
-                progressBar.setVisibility(View.VISIBLE);
-                new Handler().postDelayed(()->{
-                    if (password.equals(repassword)) {
-                        mAuth.createUserWithEmailAndPassword(email, password)
-                                .addOnCompleteListener(Register.this, new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (task.isSuccessful()) {
-                                            // Đăng ký thành công
-                                            FirebaseUser user = mAuth.getCurrentUser();
-                                            String userId = user.getUid();  // Lấy ID người dùng
-
-                                            // Tạo đối tượng User để lưu vào database
-                                            User newUser = new User(userId,postsCount,address,phone,profileImg,email,lastname,firstname);
-
-                                            // Lưu đối tượng User vào Firebase Realtime Database
-                                            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-                                            usersRef.child(userId).setValue(newUser)
-                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                Toast.makeText(Register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                                                                progressBar.setVisibility(View.GONE);
-                                                            } else {
-                                                                Toast.makeText(Register.this, "Lưu thông tin thất bại", Toast.LENGTH_SHORT).show();
-                                                                progressBar.setVisibility(View.GONE);
-                                                            }
-                                                        }
-                                                    });
-                                        } else {
-                                            Toast.makeText(Register.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                            progressBar.setVisibility(View.GONE);
-                                        }
-                                    }
-                                });
-                    } else {
-                        Toast.makeText(Register.this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
-                    }
-                },2000);
-
-            }
-        });
     }
-    private void goToLoginActivity() {
-        Intent intent = new Intent(Register.this, Login.class);
+
+    private void setupListeners() {
+        textLogin.setOnClickListener(v -> navigateToLogin());
+        btnRegister.setOnClickListener(v -> handleRegister());
+    }
+
+    private void handleRegister() {
+        String email = editTextEmail.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+        String rePassword = editTextRePassword.getText().toString().trim();
+        String firstName = editTextFirstName.getText().toString().trim();
+        String lastName = editTextLastName.getText().toString().trim();
+        String phone = editTextPhone.getText().toString().trim();
+        String address = editTextAddress.getText().toString().trim();
+
+        if (!validateInputs(email, password, rePassword, firstName, lastName)) {
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+        btnRegister.setEnabled(false);
+
+        registerUser(email, password, firstName, lastName, phone, address);
+    }
+
+    private boolean validateInputs(String email, String password, String rePassword, String firstName, String lastName) {
+        if (email.isEmpty()) {
+            editTextEmail.setError("Vui lòng nhập email");
+            editTextEmail.requestFocus();
+            return false;
+        }
+        if (password.isEmpty()) {
+            editTextPassword.setError("Vui lòng nhập mật khẩu");
+            editTextPassword.requestFocus();
+            return false;
+        }
+        if (password.length() < MIN_PASSWORD_LENGTH) {
+            editTextPassword.setError("Mật khẩu phải có ít nhất " + MIN_PASSWORD_LENGTH + " ký tự");
+            editTextPassword.requestFocus();
+            return false;
+        }
+        if (!password.equals(rePassword)) {
+            editTextRePassword.setError("Mật khẩu không khớp");
+            editTextRePassword.requestFocus();
+            return false;
+        }
+        if (firstName.isEmpty()) {
+            editTextFirstName.setError("Vui lòng nhập tên");
+            editTextFirstName.requestFocus();
+            return false;
+        }
+        if (lastName.isEmpty()) {
+            editTextLastName.setError("Vui lòng nhập họ");
+            editTextLastName.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private void registerUser(String email, String password, String firstName, String lastName, String phone, String address) {
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = auth.getCurrentUser();
+                        if (user != null) {
+                            saveUserToDatabase(user.getUid(), email, firstName, lastName, phone, address);
+                        } else {
+                            showError("Không thể lấy thông tin người dùng");
+                        }
+                    } else {
+                        showError("Đăng ký thất bại: " + task.getException().getMessage());
+                    }
+                });
+    }
+
+    private void saveUserToDatabase(String userId, String email, String firstName, String lastName, String phone, String address) {
+        User newUser = new User(userId, 0, address, phone, DEFAULT_PROFILE_IMAGE, email, lastName, firstName);
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        usersRef.setValue(newUser)
+                .addOnCompleteListener(task -> {
+                    progressBar.setVisibility(View.GONE);
+                    btnRegister.setEnabled(true);
+
+                    if (task.isSuccessful()) {
+                        showToast("Đăng ký thành công!");
+                        navigateToLogin();
+                    } else {
+                        showError("Lưu thông tin thất bại: " + task.getException().getMessage());
+                    }
+                });
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(this, Login.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void showError(String message) {
+        progressBar.setVisibility(View.GONE);
+        btnRegister.setEnabled(true);
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

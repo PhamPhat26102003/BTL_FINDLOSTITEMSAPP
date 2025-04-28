@@ -8,20 +8,82 @@
     tools:context=".pages.search.SearchActivity">
 
     <!-- Nội dung chính của trang (có thể là FrameLayout hoặc RecyclerView) -->
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNav" >
+        android:layout_above="@id/bottomNav">
+        <!-- Banner -->
+        <include layout="@layout/layout_profile_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp" />
 
         <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile Activity"
-            android:textSize="26dp"
-            android:layout_gravity="center"/>
-    </FrameLayout>
+            android:id="@+id/textEmail"
+            android:layout_width="300dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="304dp"
+            android:layout_marginEnd="56dp"
+            android:text="TextView"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageViewProfile"
+            android:layout_width="68dp"
+            android:layout_height="77dp"
+            android:layout_marginStart="168dp"
+            android:layout_marginTop="176dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <Button
+            android:id="@+id/BtnChangePass"
+            android:layout_width="133dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="136dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="142dp"
+            android:text="Đổi mật khẩu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textEmail" />
+
+        <Button
+            android:id="@+id/btnUpdateInfo"
+            android:layout_width="215dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="136dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginEnd="142dp"
+            android:text="Cập nhật thông tin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.463"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/BtnChangePass" />
+
+        <TextView
+            android:id="@+id/textName"
+            android:layout_width="142dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="132dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="137dp"
+            android:text="TextView"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewProfile" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- BottomNavigationView ở dưới cùng -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

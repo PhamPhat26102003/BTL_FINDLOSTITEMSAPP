@@ -144,7 +144,7 @@
 
             <Button
                 style="@style/CustomButton"
-                android:id="@+id/btnGoogle"
+                android:id="@+id/btnGoogleLogin"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"

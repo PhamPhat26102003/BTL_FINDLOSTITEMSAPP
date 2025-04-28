@@ -4,12 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.pages.home.Home;
-import com.example.findlostitemsapp.pages.post.PostsActivity;
+import com.example.findlostitemsapp.pages.post.Post;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -63,7 +67,7 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     private void openPost() {
-        Intent intent = new Intent(NotificationActivity.this, PostsActivity.class);
+        Intent intent = new Intent(NotificationActivity.this, Post.class);
         startActivity(intent);
     }
 
