@@ -1,4 +1,5 @@
 package com.example.findlostitemsapp.pages.profile;
+import static com.example.findlostitemsapp.pages.uiutils.UiUtils.setupBottomNavigation;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.pages.home.Home;
+import com.example.findlostitemsapp.pages.login.Login;
 import com.example.findlostitemsapp.pages.notification.NotificationActivity;
 import com.example.findlostitemsapp.pages.post.PostsActivity;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
@@ -48,9 +50,9 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String LOGIN_METHOD_GOOGLE = "google";
 
     private FirebaseAuth auth;
-    private TextView textName, textEmail;
+    private TextView textName, textEmail, loginNow;
     private ImageView imageViewProfile;
-    private Button btnChangePassword, btnUpdateInfo;
+    private Button btnChangePassword, btnUpdateInfo, btnloginNow;
     private BottomNavigationView bottomNav;
     private SharedPreferences sharedPreferences;
 
@@ -64,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
         initializeUi();
         setupListeners();
         loadUserInfo();
-        setupBottomNavigation();
+        setupBottomNavigation(this, bottomNav, R.id.nav_profile);
     }
 
     private void initializeUi() {
@@ -74,13 +76,21 @@ public class ProfileActivity extends AppCompatActivity {
         btnChangePassword = findViewById(R.id.BtnChangePass);
         btnUpdateInfo = findViewById(R.id.btnUpdateInfo);
         bottomNav = findViewById(R.id.bottomNav);
+        btnloginNow =findViewById(R.id.btnloginNow);
+        loginNow = findViewById(R.id.loginNow);
     }
 
     private void setupListeners() {
         btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
         btnUpdateInfo.setOnClickListener(v -> showUpdateInfoDialog());
+        btnloginNow.setOnClickListener(v -> loginNow());
     }
-
+    private void loginNow(){
+        Intent intent = new Intent(this, Login.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
     private void showChangePasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Đổi mật khẩu");
@@ -285,7 +295,13 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadUserInfo() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
-            showToast("Chưa đăng nhập, vui lòng đăng nhập lại");
+            textName.setVisibility(View.GONE);
+            textEmail.setVisibility(View.GONE);
+            btnUpdateInfo.setVisibility(View.GONE);
+            btnChangePassword.setVisibility(View.GONE);
+            loginNow.setVisibility(View.VISIBLE);
+            btnloginNow.setVisibility(View.VISIBLE);
+            showToast("Chưa đăng nhập, vui lòng đăng nhậ");
             return;
         }
 
@@ -369,28 +385,5 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void showToast(String message) {
         showToast(message, Toast.LENGTH_SHORT);
-    }
-
-    private void setupBottomNavigation() {
-        bottomNav.setSelectedItemId(R.id.nav_profile);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(this, Home.class));
-                return true;
-            } else if (itemId == R.id.nav_search) {
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-            } else if (itemId == R.id.nav_post) {
-                startActivity(new Intent(this, PostsActivity.class));
-                return true;
-            } else if (itemId == R.id.nav_notifications) {
-                startActivity(new Intent(this, NotificationActivity.class));
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                return true;
-            }
-            return false;
-        });
     }
 }
