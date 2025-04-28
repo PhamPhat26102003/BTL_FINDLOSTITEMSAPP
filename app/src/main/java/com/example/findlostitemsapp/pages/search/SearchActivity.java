@@ -48,7 +48,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
 
     private PostAdapter postAdapter;
     private List<Post> postList = new ArrayList<>();
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference,databaseSpinnerReference;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Override
@@ -62,6 +62,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         setupRecyclerView();
 
         databaseReference = FirebaseDatabase.getInstance().getReference("posts");
+        databaseSpinnerReference = FirebaseDatabase.getInstance().getReference();
 
         // Load spinner data
         loadSpinnerData("tag", spinnerLoaiBaiViet, "Loại bài viết");
@@ -98,7 +99,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
     }
 
     private void loadSpinnerData(String nodeName, Spinner spinner, String hintText) {
-        databaseReference.child(nodeName).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseSpinnerReference.child(nodeName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<String> items = new ArrayList<>();
