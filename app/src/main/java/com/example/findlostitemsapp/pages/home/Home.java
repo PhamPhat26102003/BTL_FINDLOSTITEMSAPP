@@ -5,7 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.MenuItem
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,10 +24,12 @@ import com.example.findlostitemsapp.pages.login.Login;
 import com.example.findlostitemsapp.pages.notification.NotificationActivity;
 import com.example.findlostitemsapp.pages.post.PostDetailActivity;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
+import com.example.findlostitemsapp.pages.register.Register;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -87,7 +90,7 @@ public class Home extends AppCompatActivity implements PostAdapter.OnPostClickLi
             menuActions.put(R.id.menu_login, () -> login());
             menuActions.put(R.id.menu_register, () -> register());
             menuActions.put(R.id.menu_logout, () -> logout());
-//                menuActions.put(R.id.menu_profile, () -> openProfile());
+            menuActions.put(R.id.menu_profile, () -> openProfile());
 //                menuActions.put(R.id.menu_history, () -> openHistory());
 //                menuActions.put(R.id.menu_settings, () -> openSettings());
             popupMenu.setOnMenuItemClickListener(item -> {

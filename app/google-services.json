@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "144477079876",
+    "firebase_url": "https://dbfindlostitemsapp-default-rtdb.firebaseio.com",
     "project_id": "dbfindlostitemsapp",
     "storage_bucket": "dbfindlostitemsapp.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.findlostitemsapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "144477079876-qhm7158ldb46kplbqhn55gii7m18miqn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.findlostitemsapp",
+            "certificate_hash": "3e29834529543da047c7b85931fb6da88d33caf0"
+          }
+        },
+        {
+          "client_id": "144477079876-jg338ghvhgalea8snoppfk3umvjk8ldi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD2WjCdmNLNR8zr1I6PXN6rB_i9dfln1Xo"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "144477079876-jg338ghvhgalea8snoppfk3umvjk8ldi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
