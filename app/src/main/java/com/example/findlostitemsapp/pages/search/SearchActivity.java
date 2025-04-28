@@ -1,20 +1,17 @@
 package com.example.findlostitemsapp.pages.search;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,8 +19,9 @@ import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.pages.home.Home;
 import com.example.findlostitemsapp.pages.home.PostAdapter;
 import com.example.findlostitemsapp.pages.notification.NotificationActivity;
-import com.example.findlostitemsapp.pages.post.Post;
+import com.example.findlostitemsapp.pages.post.*;
 import com.example.findlostitemsapp.pages.post.PostDetailActivity;
+import com.example.findlostitemsapp.pages.post.PostsActivity;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -37,6 +35,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SearchActivity extends AppCompatActivity implements PostAdapter.OnPostClickListener{
 
@@ -45,7 +45,17 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
     private DatabaseReference databaseReference;
     private RecyclerView recyclerViewPosts;
     private PostAdapter postAdapter;
+    private Button btnTimKiem, btnTatCa;
+    private EditText edtKeyword;
+    private TextView tvKetQuaSoLuong;
     private List<com.example.findlostitemsapp.model.Post> postList;
+    private List<com.example.findlostitemsapp.model.Post> originalPostList = new ArrayList<>();
+    private CustomSpinnerAdapter adapterLoaiBaiViet, adapterDanhMuc, adapterThoiGian, adapterTinhThanh;
+    private List<String> listLoaiBaiViet = new ArrayList<>();
+    private List<String> listDanhMuc = new ArrayList<>();
+    private List<String> listThoiGian = new ArrayList<>();
+    private List<String> listTinhThanh = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +67,23 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         bottomNavigationBarAction();
 
         //loda data spinner
-        List<String> listLoaiBaiViet = new ArrayList<>();
-        List<String> listDanhMuc = new ArrayList<>();
-        List<String> listThoiGian = new ArrayList<>();
-        List<String> listTinhThanh = new ArrayList<>();
-        loadSpinnerData("post_types",listLoaiBaiViet,spinnerLoaiBaiViet,"Loại bài viết");
-        loadSpinnerData("categories",listDanhMuc,spinnerDanhMuc,"Danh mục");
-        loadSpinnerData("time_filters",listThoiGian,spinnerThoiGian,"Thời gian");
-        loadSpinnerData("locations",listTinhThanh,spinnerTinhThanh,"Tỉnh/Thành phố");
+        adapterLoaiBaiViet = new CustomSpinnerAdapter(this, listLoaiBaiViet, spinnerLoaiBaiViet);
+        spinnerLoaiBaiViet.setAdapter(adapterLoaiBaiViet);
+
+        adapterDanhMuc = new CustomSpinnerAdapter(this, listDanhMuc, spinnerDanhMuc);
+        spinnerDanhMuc.setAdapter(adapterDanhMuc);
+
+        adapterThoiGian = new CustomSpinnerAdapter(this, listThoiGian, spinnerThoiGian);
+        spinnerThoiGian.setAdapter(adapterThoiGian);
+
+        adapterTinhThanh = new CustomSpinnerAdapter(this, listTinhThanh, spinnerTinhThanh);
+        spinnerTinhThanh.setAdapter(adapterTinhThanh);
+
+        loadSpinnerData("tag", listLoaiBaiViet, adapterLoaiBaiViet, "Loại bài viết");
+        loadSpinnerData("itemCategory", listDanhMuc, adapterDanhMuc, "Danh mục");
+        loadSpinnerData("time_filters", listThoiGian, adapterThoiGian, "Thời gian");
+        loadSpinnerData("location", listTinhThanh, adapterTinhThanh, "Tỉnh/Thành phố");
+
 
         // Khởi tạo RecyclerView và PostAdapter
         postList = new ArrayList<>();
@@ -76,6 +95,69 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
 
         // Lấy dữ liệu từ Firebase
         loadPostsFromFirebase();
+
+        // xử lí click tìm kiếm để lọc
+        btnTimKiem.setOnClickListener(v -> {
+            logCatSearch();
+        });
+
+
+        // xu li nut tat ca
+
+        btnTatCa.setOnClickListener(v -> {
+            // Xóa toàn bộ lựa chọn lọc
+            edtKeyword.setText(""); // Xóa ô tìm kiếm
+
+            spinnerLoaiBaiViet.setSelection(0);        // Chọn "Tất cả"
+            spinnerDanhMuc.setSelection(0);   // Chọn "Tất cả"
+            spinnerTinhThanh.setSelection(0);   // Chọn "Tất cả"
+            spinnerThoiGian.setSelection(0);       // Chọn "Tất cả"
+
+            // Hiển thị lại toàn bộ danh sách gốc
+            postAdapter.updatePosts(originalPostList);
+
+        });
+
+
+    }
+
+    private void logCatSearch() {
+        String keyword = edtKeyword.getText().toString().trim();
+        String selectedTag = spinnerLoaiBaiViet.getSelectedItem().toString();
+        String selectedCategory = spinnerDanhMuc.getSelectedItem().toString();
+        String selectedLocation = spinnerTinhThanh.getSelectedItem().toString();
+        String selectedTime = spinnerThoiGian.getSelectedItem().toString();
+
+        Log.d("DEBUG", "Từ khóa: " + keyword);
+        Log.d("DEBUG", "Tag: " + selectedTag);
+        Log.d("DEBUG", "Danh mục: " + selectedCategory);
+        Log.d("DEBUG", "Tỉnh/Thành: " + selectedLocation);
+        Log.d("DEBUG", "Thời gian: " + selectedTime);
+
+        if (originalPostList == null || originalPostList.isEmpty()) {
+            Log.d("DEBUG", "Danh sách bài viết gốc rỗng hoặc chưa load xong.");
+            return;
+        }
+
+        // Log tiêu đề từng bài trước khi lọc
+        for (com.example.findlostitemsapp.model.Post post : originalPostList) {
+            Log.d("DEBUG", "Tiêu đề: " + post.getTitle() + " | Mô tả: " + post.getDescription());
+        }
+
+        PostFilterUtils filterUtils = new PostFilterUtils();
+        List<com.example.findlostitemsapp.model.Post> filteredList = filterUtils.filterPosts(
+                originalPostList,  // <-- danh sách gốc đã được load từ Firebase
+                keyword,
+                selectedTag,
+                selectedCategory,
+                selectedLocation,
+                selectedTime
+        );
+
+        Log.d("DEBUG", "Số lượng kết quả sau lọc: " + filteredList.size());
+        tvKetQuaSoLuong.setText(String.valueOf(filteredList.size()));
+
+        postAdapter.updatePosts(filteredList);
     }
 
     private void loadPostsFromFirebase() {
@@ -105,6 +187,8 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
                     }
                 }
                 // Cập nhật trực tiếp trên main thread
+                originalPostList.clear();
+                originalPostList.addAll(tempList);
                 postList.clear();
                 postList.addAll(tempList);
                 Log.d("FirebaseData", "Tổng số bài đăng: " + postList.size());
@@ -127,7 +211,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         });
     }
 
-    private void loadSpinnerData(String nodeName, List<String> list, Spinner spinner,String hintText) {
+    private void loadSpinnerData(String nodeName, List<String> list, CustomSpinnerAdapter adapter,String hintText) {
         databaseReference.child(nodeName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -139,11 +223,9 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
                     Log.d("SpinnerData", "Loaded value: " + value);
                     list.add(value);
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(SearchActivity.this, android.R.layout.simple_spinner_item, list);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+
                 Log.d("FirebaseCheck", "Đã set adapter cho spinner: " + nodeName);
-                spinner.setSelection(0);
 
             }
 
@@ -188,7 +270,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
     }
 
     private void openPost() {
-        Intent intent = new Intent(SearchActivity.this, Post.class);
+        Intent intent = new Intent(SearchActivity.this, PostsActivity.class);
         startActivity(intent);
     }
 
@@ -208,6 +290,10 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         spinnerDanhMuc = findViewById(R.id.spinnerDanhMuc);
         spinnerThoiGian = findViewById(R.id.spinnerThoiGian);
         spinnerTinhThanh = findViewById(R.id.spinnerTinhThanh);
+        btnTimKiem = findViewById(R.id.btnTimKiem);
+        edtKeyword = findViewById(R.id.edtKeyword);
+        btnTatCa = findViewById(R.id.btnTatCa);
+        tvKetQuaSoLuong = findViewById(R.id.tvKetQuaSoLuong);
 
         recyclerViewPosts = findViewById(R.id.recyclerViewPosts);
 

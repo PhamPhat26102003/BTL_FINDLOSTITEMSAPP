@@ -1,34 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="15dp"
+    android:orientation="vertical"
     tools:context=".pages.search.SearchActivity">
 
-    <!-- Nội dung chính của trang (có thể là FrameLayout hoặc RecyclerView) -->
-    <FrameLayout
-        android:id="@+id/content_frame"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottomNav" >
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/toolbar_background"
+        app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
+        app:theme="@style/Theme.Design.NoActionBar">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notification Activity"
-            android:textSize="26dp"
-            android:layout_gravity="center"/>
-    </FrameLayout>
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Thông báo"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Danh sách thông báo -->
 
     <!-- BottomNavigationView ở dưới cùng -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="0dp"
+        android:clipToPadding="false"
+        android:padding="12dp" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:elevation="8dp"
         app:itemIconTint="@color/bottom_nav_selector"
@@ -36,4 +52,4 @@
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 
-</RelativeLayout>
+</LinearLayout>

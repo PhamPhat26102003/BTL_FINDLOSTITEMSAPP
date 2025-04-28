@@ -3,6 +3,7 @@ package com.example.findlostitemsapp.pages.notification;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -10,20 +11,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.findlostitemsapp.R;
+import com.example.findlostitemsapp.model.NotificationModel;
 import com.example.findlostitemsapp.pages.home.Home;
-import com.example.findlostitemsapp.pages.post.Post;
+import com.example.findlostitemsapp.pages.post.*;
 import com.example.findlostitemsapp.pages.profile.ProfileActivity;
 import com.example.findlostitemsapp.pages.search.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NotificationActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
+    private RecyclerView recyclerView;
+    private NotificationAdapter adapter;
+    private List<NotificationModel> notificationList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +41,29 @@ public class NotificationActivity extends AppCompatActivity {
         initUi();
 
         bottomNavigationBarAction();
+
+        loadNotification();
+    }
+
+    private void loadNotification() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(v -> finish());
+
+        // Khởi tạo RecyclerView
+        recyclerView = findViewById(R.id.recyclerViewNotifications);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Danh sách mẫu
+        notificationList = new ArrayList<>();
+        notificationList.add(new NotificationModel("Báo mất đồ thành công", "Yêu cầu của bạn đã được ghi nhận", "2 phút trước"));
+        notificationList.add(new NotificationModel("Đồ vật đã được tìm thấy", "Đội ngũ của chúng tôi đã tìm được ví của bạn", "1 giờ trước"));
+        notificationList.add(new NotificationModel("Xác minh tài khoản", "Vui lòng xác minh email để sử dụng đầy đủ chức năng", "Hôm qua"));
+
+        adapter = new NotificationAdapter(notificationList);
+        recyclerView.setAdapter(adapter);
     }
 
     private void bottomNavigationBarAction() {
@@ -67,7 +99,7 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     private void openPost() {
-        Intent intent = new Intent(NotificationActivity.this, Post.class);
+        Intent intent = new Intent(NotificationActivity.this, PostsActivity.class);
         startActivity(intent);
     }
 

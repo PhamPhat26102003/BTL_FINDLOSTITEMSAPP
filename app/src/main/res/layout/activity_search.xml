@@ -46,6 +46,7 @@
 
                     <!-- Ô nhập từ khóa -->
                     <EditText
+                        android:id="@+id/edtKeyword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Nhập từ khóa tìm kiếm"
@@ -115,14 +116,30 @@
 
 
             <!-- Kết quả tìm kiếm -->
-            <TextView
-                android:id="@+id/tvKetQua"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Kết quả tìm kiếm: 0"
-                android:textSize="19dp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tvKetQuaLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kết quả tìm kiếm: "
+                    android:textSize="19dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvKetQuaSoLuong"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="19dp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
 
             <!-- RecyclerView hiển thị kết quả -->
             <androidx.recyclerview.widget.RecyclerView
