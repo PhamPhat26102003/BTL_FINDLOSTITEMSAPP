@@ -144,5 +144,14 @@
                 android:textStyle="bold"
                 android:textSize="14sp" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:layout_height="38dp"
+            android:layout_gravity="center"
+            android:text="Xóa bài viết"
+            card_view:icon="@android:drawable/ic_menu_delete" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

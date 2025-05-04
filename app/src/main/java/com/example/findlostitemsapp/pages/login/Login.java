@@ -34,33 +34,35 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
 
-    private static final String PREFS_NAME = "UserSession";
-    private static final String LOGIN_METHOD_EMAIL = "email";
-    private static final String LOGIN_METHOD_GOOGLE = "google";
-    private static final int RC_SIGN_IN = 1001;
-    private static final String GOOGLE_CLIENT_ID = "144477079876-jg338ghvhgalea8snoppfk3umvjk8ldi.apps.googleusercontent.com";
+    // Các hằng số xác định phương thức đăng nhập và ID Google Client
+    private static final String PREFS_NAME = "UserSession"; // Tên file SharedPreferences
+    private static final String LOGIN_METHOD_EMAIL = "email"; // Phương thức đăng nhập qua email
+    private static final String LOGIN_METHOD_GOOGLE = "google"; // Phương thức đăng nhập qua Google
+    private static final int RC_SIGN_IN = 1001; // Mã yêu cầu đăng nhập Google
+    private static final String GOOGLE_CLIENT_ID = "144477079876-jg338ghvhgalea8snoppfk3umvjk8ldi.apps.googleusercontent.com"; // Client ID cho Google Sign-In
 
-    private FirebaseAuth auth;
-    private GoogleSignInClient googleSignInClient;
-    private EditText editTextEmail, editTextPassword;
-    private Button btnLogin, btnGoogleLogin;
-    private TextView textBreadcrumb, textLoggedOut, textRegister, textHome;
-    private ProgressBar progressBar;
-    private SharedPreferences sharedPreferences;
+    private FirebaseAuth auth; // Đối tượng FirebaseAuth để quản lý xác thực người dùng
+    private GoogleSignInClient googleSignInClient; // Đối tượng để quản lý Google Sign-In
+    private EditText editTextEmail, editTextPassword; // Các trường nhập liệu cho email và mật khẩu
+    private Button btnLogin, btnGoogleLogin; // Các nút đăng nhập qua email và Google
+    private TextView textBreadcrumb, textLoggedOut, textRegister, textHome; // Các phần tử UI khác
+    private ProgressBar progressBar; // Thanh tiến trình để thông báo khi đang xử lý
+    private SharedPreferences sharedPreferences; // Đối tượng SharedPreferences để lưu trữ thông tin phiên đăng nhập
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login); // Thiết lập giao diện của Activity
 
-        auth = FirebaseAuth.getInstance();
-        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        initializeUi();
-        setupGoogleSignIn();
-        setupListeners();
-        checkLogOutStatus();
+        auth = FirebaseAuth.getInstance(); // Khởi tạo đối tượng FirebaseAuth
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE); // Lấy SharedPreferences
+        initializeUi(); // Khởi tạo các phần tử UI
+        setupGoogleSignIn(); // Thiết lập Google Sign-In
+        setupListeners(); // Cài đặt các sự kiện cho các nút
+        checkLogOutStatus(); // Kiểm tra trạng thái đăng xuất
     }
 
+    // Phương thức khởi tạo giao diện người dùng
     private void initializeUi() {
         progressBar = findViewById(R.id.progressBar);
         textBreadcrumb = findViewById(R.id.textBreadcrumb);
@@ -72,46 +74,55 @@ public class Login extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
 
+        // Tạo đoạn văn bản có màu cho phần breadcrumb
         UiUtils.setColoredSpan(textBreadcrumb, "🏠 Trang chủ > Đăng nhập", "Trang chủ", "#00D46F");
     }
 
+    // Phương thức thiết lập Google Sign-In
     private void setupGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(GOOGLE_CLIENT_ID)
-                .requestEmail()
+                .requestIdToken(GOOGLE_CLIENT_ID) // Yêu cầu ID Token
+                .requestEmail() // Yêu cầu email
                 .build();
-        googleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleSignInClient = GoogleSignIn.getClient(this, gso); // Tạo đối tượng GoogleSignInClient
     }
 
+    // Phương thức thiết lập các sự kiện cho các phần tử UI
     private void setupListeners() {
+        // Khi nhấn vào "Đăng ký", chuyển sang trang Đăng ký
         textRegister.setOnClickListener(v -> navigateToActivity(Register.class));
+        // Khi nhấn vào "Trang chủ", chuyển sang trang Trang chủ
         textHome.setOnClickListener(v -> navigateToActivity(Home.class));
+        // Khi nhấn vào nút Đăng nhập với Email
         btnLogin.setOnClickListener(v -> handleEmailLogin());
+        // Khi nhấn vào nút Đăng nhập với Google
         btnGoogleLogin.setOnClickListener(v -> signInWithGoogle());
     }
 
+    // Kiểm tra trạng thái đăng xuất khi vào màn hình đăng nhập
     private void checkLogOutStatus() {
         boolean loggedOut = getIntent().getBooleanExtra("LOGGED_OUT", false);
-        textLoggedOut.setVisibility(loggedOut ? View.VISIBLE : View.GONE);
+        textLoggedOut.setVisibility(loggedOut ? View.VISIBLE : View.GONE); // Hiển thị thông báo nếu người dùng đã đăng xuất
     }
 
+    // Phương thức xử lý đăng nhập với Email
     private void handleEmailLogin() {
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
         if (!validateInputs(email, password)) {
-            return;
+            return; // Kiểm tra đầu vào
         }
 
-        progressBar.setVisibility(View.VISIBLE);
-        btnLogin.setEnabled(false);
+        progressBar.setVisibility(View.VISIBLE); // Hiển thị thanh tiến trình
+        btnLogin.setEnabled(false); // Vô hiệu hóa nút đăng nhập trong khi đang xử lý
 
-        auth.signInWithEmailAndPassword(email, password)
+        auth.signInWithEmailAndPassword(email, password) // Gọi Firebase để xác thực người dùng
                 .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
+                    if (task.isSuccessful()) { // Nếu đăng nhập thành công
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null) {
-                            fetchUserData(user.getUid());
+                            fetchUserData(user.getUid()); // Lấy dữ liệu người dùng từ Firebase Database
                         } else {
                             showError("Không thể lấy thông tin người dùng");
                         }
@@ -121,6 +132,7 @@ public class Login extends AppCompatActivity {
                 });
     }
 
+    // Phương thức kiểm tra tính hợp lệ của đầu vào email và mật khẩu
     private boolean validateInputs(String email, String password) {
         if (email.isEmpty()) {
             editTextEmail.setError("Vui lòng nhập email");
@@ -135,27 +147,29 @@ public class Login extends AppCompatActivity {
         return true;
     }
 
+    // Lấy dữ liệu người dùng từ Firebase Database
     private void fetchUserData(String userId) {
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    // Lấy các thông tin người dùng
                     String firstName = snapshot.child("firstName").getValue(String.class);
                     String lastName = snapshot.child("lastName").getValue(String.class);
                     String email = snapshot.child("email").getValue(String.class);
                     String phone = snapshot.child("phoneNumber").getValue(String.class);
                     String address = snapshot.child("address").getValue(String.class);
 
-                    // Tạo userName từ firstName và lastName
+                    // Tạo tên người dùng từ firstName và lastName
                     String userName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
                     userName = userName.trim();
                     if (userName.isEmpty()) {
                         userName = "Người dùng ẩn danh";
                     }
 
-                    saveUserSession(userName, firstName, lastName, email, phone, address, LOGIN_METHOD_EMAIL);
-                    navigateToActivity(Home.class);
+                    saveUserSession(userName, firstName, lastName, email, phone, address, LOGIN_METHOD_EMAIL); // Lưu thông tin người dùng vào SharedPreferences
+                    navigateToActivity(Home.class); // Chuyển sang trang chính
                 } else {
                     showError("Không tìm thấy thông tin người dùng!");
                 }
@@ -168,11 +182,13 @@ public class Login extends AppCompatActivity {
         });
     }
 
+    // Phương thức đăng nhập với Google
     private void signInWithGoogle() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(signInIntent, RC_SIGN_IN); // Khởi tạo intent đăng nhập Google
     }
 
+    // Xử lý kết quả trả về từ Google Sign-In
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -188,6 +204,7 @@ public class Login extends AppCompatActivity {
         }
     }
 
+    // Xác thực người dùng thông qua Google
     private void firebaseAuthWithGoogle(String idToken, String displayName, String email) {
         progressBar.setVisibility(View.VISIBLE);
         btnGoogleLogin.setEnabled(false);
@@ -204,8 +221,8 @@ public class Login extends AppCompatActivity {
                             userRef.child("userName").setValue(userName);
                             userRef.child("email").setValue(email);
 
-                            saveGoogleUserSession(userName, email);
-                            navigateToActivity(Home.class);
+                            saveGoogleUserSession(userName, email); // Lưu thông tin đăng nhập Google
+                            navigateToActivity(Home.class); // Chuyển sang trang chính
                         } else {
                             showError("Không thể lấy thông tin người dùng");
                         }
@@ -215,6 +232,7 @@ public class Login extends AppCompatActivity {
                 });
     }
 
+    // Lưu thông tin người dùng sau khi đăng nhập qua Email
     private void saveUserSession(String userName, String firstName, String lastName, String email, String phone, String address, String loginMethod) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userName", userName);
@@ -225,29 +243,28 @@ public class Login extends AppCompatActivity {
         editor.putString("address", address);
         editor.putString("loginMethod", loginMethod);
         editor.putBoolean("isLoggedIn", true);
-        editor.apply();
+        editor.apply(); // Lưu thông tin vào SharedPreferences
     }
 
+    // Lưu thông tin người dùng sau khi đăng nhập qua Google
     private void saveGoogleUserSession(String userName, String email) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userName", userName);
         editor.putString("email", email);
         editor.putString("loginMethod", LOGIN_METHOD_GOOGLE);
         editor.putBoolean("isLoggedIn", true);
-        editor.apply();
+        editor.apply(); // Lưu thông tin vào SharedPreferences
     }
 
+    // Điều hướng đến màn hình mới
     private void navigateToActivity(Class<?> targetActivity) {
         Intent intent = new Intent(this, targetActivity);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        finish();
+        finish(); // Đóng màn hình hiện tại
     }
 
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
+    // Hiển thị thông báo lỗi
     private void showError(String message) {
         progressBar.setVisibility(View.GONE);
         btnLogin.setEnabled(true);

@@ -47,8 +47,8 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
     private RecyclerView recyclerViewPosts;
 
     private PostAdapter postAdapter;
-    private List<Post> postList = new ArrayList<>();
-    private DatabaseReference databaseReference,databaseSpinnerReference;
+    private List<Post> postList = new ArrayList<>(); // Dữ liệu bài đăng đã tải từ Firebase
+    private DatabaseReference databaseReference, databaseSpinnerReference;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Override
@@ -56,21 +56,21 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        initUi();
-        setupBottomNavigation(this, bottomNav, R.id.nav_search);
-        setupButtonActions();
-        setupRecyclerView();
+        initUi(); // Khởi tạo giao diện
+        setupBottomNavigation(this, bottomNav, R.id.nav_search); // Thiết lập thanh điều hướng dưới
+        setupButtonActions(); // Cài đặt hành động cho nút
+        setupRecyclerView(); // Cài đặt RecyclerView
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("posts");
+        databaseReference = FirebaseDatabase.getInstance().getReference("posts"); // Tham chiếu đến Firebase
         databaseSpinnerReference = FirebaseDatabase.getInstance().getReference();
 
-        // Load spinner data
+        // Load dữ liệu cho các spinner
         loadSpinnerData("tag", spinnerLoaiBaiViet, "Loại bài viết");
         loadSpinnerData("itemCategory", spinnerDanhMuc, "Danh mục");
         loadSpinnerData("time_filters", spinnerThoiGian, "Thời gian");
         loadSpinnerData("location", spinnerTinhThanh, "Tỉnh/Thành phố");
 
-        // Load posts initially
+        // Load bài đăng từ Firebase khi mở ứng dụng
         loadPostsFromFirebase();
     }
 
@@ -88,14 +88,14 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
     }
 
     private void setupRecyclerView() {
-        postAdapter = new PostAdapter(this, postList, this);
+        postAdapter = new PostAdapter(this, postList, this); // Cài đặt Adapter cho RecyclerView
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewPosts.setAdapter(postAdapter);
     }
 
     private void setupButtonActions() {
-        btnTimKiem.setOnClickListener(v -> performSearch());
-        btnTatCa.setOnClickListener(v -> showAllPosts());
+        btnTimKiem.setOnClickListener(v -> performSearch()); // Khi nhấn tìm kiếm
+        btnTatCa.setOnClickListener(v -> showAllPosts()); // Khi nhấn xem tất cả bài đăng
     }
 
     private void loadSpinnerData(String nodeName, Spinner spinner, String hintText) {
@@ -125,6 +125,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         });
     }
 
+    // Load các bài đăng từ Firebase
     private void loadPostsFromFirebase() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -134,7 +135,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
                     Log.w("FirebaseData", "Node 'posts' không tồn tại hoặc rỗng");
                     Toast.makeText(SearchActivity.this, "Không có bài đăng nào", Toast.LENGTH_SHORT).show();
                     postList.clear();
-                    postAdapter.updatePosts(new ArrayList<>(postList));
+                    postAdapter.updatePosts(new ArrayList<>(postList)); // Cập nhật giao diện
                     return;
                 }
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
@@ -151,19 +152,11 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
                         Log.e("FirebaseData", "Lỗi parse post từ snapshot: " + postSnapshot.getKey(), e);
                     }
                 }
-                // Cập nhật trực tiếp trên main thread
+                // Cập nhật dữ liệu bài đăng lên giao diện
                 postList.clear();
                 postList.addAll(tempList);
-                Log.d("FirebaseData", "Tổng số bài đăng: " + postList.size());
-                Log.d("FirebaseData", "Nội dung postList trước updatePosts: " + postList.toString());
                 postAdapter.updatePosts(tempList);
                 Log.d("FirebaseData", "Tổng số bài đăng sau cập nhật: " + postList.size());
-                for (Post p : tempList) {
-                    Log.d("FirebaseData", "Bài đăng trong postList: " + p.getTitle());
-                }
-                if (tempList.isEmpty()) {
-                    Toast.makeText(SearchActivity.this, "Không tìm thấy bài đăng", Toast.LENGTH_SHORT).show();
-                }
             }
 
             @Override
@@ -174,6 +167,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         });
     }
 
+    // Thực hiện tìm kiếm theo từ khóa và các bộ lọc
     private void performSearch() {
         String keyword = editTextSearch.getText().toString().trim().toLowerCase();
         String loaiBaiViet = spinnerLoaiBaiViet.getSelectedItem() != null &&
@@ -193,10 +187,11 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         Calendar calendar = Calendar.getInstance();
         long currentTime = calendar.getTimeInMillis();
 
+        // Lọc bài đăng theo các tiêu chí tìm kiếm
         for (Post post : postList) {
             boolean match = true;
 
-            // Keyword search
+            // Kiểm tra từ khóa tìm kiếm
             if (!keyword.isEmpty()) {
                 String title = post.getTitle() != null ? post.getTitle().toLowerCase() : "";
                 String description = post.getDescription() != null ? post.getDescription().toLowerCase() : "";
@@ -205,22 +200,16 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
                 }
             }
 
-            // Tag filter
+            // Lọc theo các bộ lọc khác
             if (!loaiBaiViet.isEmpty() && !post.getTag().equalsIgnoreCase(loaiBaiViet)) {
                 match = false;
             }
-
-            // Category filter
             if (!danhMuc.isEmpty() && !post.getItemCategory().equalsIgnoreCase(danhMuc)) {
                 match = false;
             }
-
-            // Location filter
             if (!tinhThanh.isEmpty() && !post.getLocation().equalsIgnoreCase(tinhThanh)) {
                 match = false;
             }
-
-            // Time filter
             if (!thoiGian.isEmpty()) {
                 try {
                     Date postDate = dateFormat.parse(post.getPostDate());
@@ -240,13 +229,10 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
                         case "6 tháng":
                             if (daysDiff > 180) match = false;
                             break;
-                        default:
-                            // No time filter applied for other values
-                            break;
                     }
                 } catch (ParseException e) {
                     Log.e("SearchActivity", "Error parsing date: " + post.getPostDate(), e);
-                    match = false; // Skip posts with invalid dates
+                    match = false;
                 }
             }
 
@@ -264,15 +250,16 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         }
     }
 
+    // Hiển thị tất cả bài đăng
     private void showAllPosts() {
-        postAdapter.updatePosts(postList);
-        tvKetQua.setText("Tổng số bài đăng: " + postList.size());
+        postAdapter.updatePosts(postList); // Cập nhật lại dữ liệu cho RecyclerView
+        tvKetQua.setText("Tổng số bài đăng: " + postList.size()); // Hiển thị tổng số bài đăng
         Toast.makeText(this, "Hiển thị tất cả " + postList.size() + " bài đăng.", Toast.LENGTH_SHORT).show();
-        loadPostsFromFirebase();
     }
 
     @Override
     public void onPostClick(Post post) {
+        // Chuyển đến màn hình chi tiết bài đăng khi người dùng nhấn vào bài đăng
         Intent intent = new Intent(this, PostDetailActivity.class);
         intent.putExtra("post_data", post);
         startActivity(intent);

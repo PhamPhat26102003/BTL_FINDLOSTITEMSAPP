@@ -54,51 +54,75 @@ import okhttp3.Response;
 
 public class PostsActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_PICK = 1001;
-    private static final int REQUEST_LOCATION_PERMISSION = 1002;
     private static final int REQUEST_LOGIN = 1004;
+
     private BottomNavigationView bottomNav;
     private EditText editTitle, editDescription, editPhoneNumber;
     private Spinner spinnerTag, spinnerCategory, spinnerLocation;
-    private Button btnPost;
-    private DatabaseReference postsRef;
+    private Button btnPost, btnSelectImage;
     private ImageView imagePreview;
-    private Button btnSelectImage, btnGetCurrentLocation;
     private Uri selectedImageUri;
     private FirebaseAuth mAuth;
+    private DatabaseReference postsRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posts);
 
-        // Khởi tạo Firebase Auth
+        // Khởi tạo Firebase Auth và kiểm tra trạng thái đăng nhập
         mAuth = FirebaseAuth.getInstance();
+        checkLoginStatus();
 
-        // Kiểm tra trạng thái đăng nhập
+        // Khởi tạo Firebase Database
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        postsRef = firebaseDatabase.getReference("posts");
+
+        // Khởi tạo giao diện người dùng
+        initUi();
+        loadSpinnerData();
+
+        // Tạo sự kiện cho nút đăng bài
+        btnPost.setOnClickListener(v -> createPost());
+
+        // Cấu hình BottomNavigation
+        bottomNavigationBarAction();
+    }
+
+    private void checkLoginStatus() {
         SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
         if (!isLoggedIn || mAuth.getCurrentUser() == null) {
             Toast.makeText(this, "Vui lòng đăng nhập để đăng bài", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(PostsActivity.this, Login.class);
             startActivityForResult(intent, REQUEST_LOGIN);
-            return;
         }
-
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        postsRef = firebaseDatabase.getReference("posts");
-
-        initUi();
-
-        loadSpinnerData("tag", spinnerTag);
-        loadSpinnerData("itemCategory", spinnerCategory);
-        loadSpinnerData("location", spinnerLocation);
-
-        bottomNavigationBarAction();
-
-        btnPost.setOnClickListener(v -> createPost());
     }
 
-    private void loadSpinnerData(String nodeName, Spinner spinner) {
+    private void initUi() {
+        bottomNav = findViewById(R.id.bottomNav);
+        editTitle = findViewById(R.id.edit_title);
+        editDescription = findViewById(R.id.edit_description);
+        editPhoneNumber = findViewById(R.id.edit_sdt);
+        spinnerTag = findViewById(R.id.spinner_tag);
+        spinnerCategory = findViewById(R.id.spinner_category);
+        btnPost = findViewById(R.id.btn_post);
+        imagePreview = findViewById(R.id.image_preview);
+        btnSelectImage = findViewById(R.id.btn_select_image);
+        spinnerLocation = findViewById(R.id.spinner_localtion);
+
+        // Chọn hình ảnh khi nhấn nút
+        btnSelectImage.setOnClickListener(v -> openImagePicker());
+    }
+
+    private void loadSpinnerData() {
+        // Tải dữ liệu cho spinner (thẻ, danh mục, vị trí)
+        loadSpinnerDataFromFirebase("tag", spinnerTag);
+        loadSpinnerDataFromFirebase("itemCategory", spinnerCategory);
+        loadSpinnerDataFromFirebase("location", spinnerLocation);
+    }
+
+    private void loadSpinnerDataFromFirebase(String nodeName, Spinner spinner) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(nodeName);
         ArrayList<String> list = new ArrayList<>();
 
@@ -109,11 +133,8 @@ public class PostsActivity extends AppCompatActivity {
                     list.add(value);
                 }
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                        PostsActivity.this,
-                        android.R.layout.simple_spinner_item,
-                        list
-                );
+                // Thiết lập dữ liệu cho spinner
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
             } else {
@@ -125,23 +146,84 @@ public class PostsActivity extends AppCompatActivity {
     private void bottomNavigationBarAction() {
         bottomNav.setSelectedItemId(R.id.nav_post);
         Map<Integer, Runnable> menuActions = new HashMap<>();
-        menuActions.put(R.id.nav_home, () -> openHome());
-        menuActions.put(R.id.nav_search, () -> openSearch());
-        menuActions.put(R.id.nav_post, () -> openPost());
-        menuActions.put(R.id.nav_notifications, () -> openNotification());
-        menuActions.put(R.id.nav_profile, () -> openProfile());
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                Runnable action = menuActions.get(item.getItemId());
-                if (action != null) {
-                    action.run();
-                    return true;
-                }
-                return false;
+        menuActions.put(R.id.nav_home, this::openHome);
+        menuActions.put(R.id.nav_search, this::openSearch);
+        menuActions.put(R.id.nav_post, this::openPost);
+        menuActions.put(R.id.nav_notifications, this::openNotification);
+        menuActions.put(R.id.nav_profile, this::openProfile);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            Runnable action = menuActions.get(id);
+            if (action != null) {
+                action.run();
+                return true;
             }
+            return false;
         });
+    }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+    }
+
+    private void createPost() {
+        String title = editTitle.getText().toString().trim();
+        String description = editDescription.getText().toString().trim();
+        String tag = spinnerTag.getSelectedItem().toString();
+        String category = spinnerCategory.getSelectedItem().toString();
+        String locationText = spinnerLocation.getSelectedItem().toString();
+        String contactInfo = editPhoneNumber.getText().toString().trim();
+
+        // Kiểm tra thông tin
+        if (title.isEmpty() || description.isEmpty() || tag.isEmpty() || category.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Lấy thông tin người dùng
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Lỗi: Không tìm thấy người dùng", Toast.LENGTH_SHORT).show();
+            openHome();
+            return;
+        }
+        String userId = currentUser.getUid();
+
+        // Tạo bài đăng mới
+        String postId = postsRef.push().getKey();
+        String postDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        Post newPost = new Post();
+        newPost.setPostId(postId);
+        newPost.setUserId(userId);
+        newPost.setTitle(title);
+        newPost.setDescription(description);
+        newPost.setTag(tag);
+        newPost.setItemCategory(category);
+        newPost.setPostDate(postDate);
+        newPost.setIsFound(false);
+        newPost.setViewCount(0);
+        newPost.setLocation(locationText);
+        newPost.setLostDate("Chưa xác định");
+        newPost.setImageUrls(new ArrayList<>());
+        newPost.setContactInfo(contactInfo);
+
+        // Nếu có hình ảnh, upload lên ImgBB
+        if (selectedImageUri != null) {
+            uploadImageToImgBB(postId, selectedImageUri, newPost);
+        } else {
+            postsRef.child(postId).setValue(newPost)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(PostsActivity.this, "Đăng tin thành công", Toast.LENGTH_SHORT).show();
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("POST_SUCCESS", true);
+                        setResult(RESULT_OK, resultIntent);
+                        openHome();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(PostsActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        }
     }
 
     private String encodeImageToBase64(Uri imageUri) {
@@ -160,14 +242,12 @@ public class PostsActivity extends AppCompatActivity {
     private void uploadImageToImgBB(String postId, Uri imageUri, Post post) {
         String apiKey = "c9828ca1066bac810b1789ed4a23b7ee";
         String base64Image = encodeImageToBase64(imageUri);
-
         if (base64Image == null) {
-            runOnUiThread(() -> Toast.makeText(PostsActivity.this, "Không thể đọc ảnh", Toast.LENGTH_SHORT).show());
+            Toast.makeText(this, "Không thể đọc ảnh", Toast.LENGTH_SHORT).show();
             return;
         }
 
         OkHttpClient client = new OkHttpClient();
-
         RequestBody formBody = new FormBody.Builder()
                 .add("key", apiKey)
                 .add("image", base64Image)
@@ -217,79 +297,7 @@ public class PostsActivity extends AppCompatActivity {
         });
     }
 
-    private void createPost() {
-        String title = editTitle.getText().toString().trim();
-        String description = editDescription.getText().toString().trim();
-        String tag = spinnerTag.getSelectedItem().toString();
-        String category = spinnerCategory.getSelectedItem().toString();
-        String locationText = spinnerLocation.getSelectedItem().toString();
-        String contactInfo = editPhoneNumber.getText().toString().trim();
-
-        // Kiểm tra dữ liệu
-        if (title.isEmpty() || description.isEmpty() || tag.isEmpty() || category.isEmpty()) {
-            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Lấy thông tin người dùng
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            Toast.makeText(this, "Lỗi: Không tìm thấy người dùng", Toast.LENGTH_SHORT).show();
-            openHome();
-            return;
-        }
-        String userId = currentUser.getUid();
-
-        // Tạo một Post mới
-        String postId = postsRef.push().getKey();
-        String postDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-
-        Post newPost = new Post();
-        newPost.setPostId(postId);
-        newPost.setUserId(userId);
-        newPost.setTitle(title);
-        newPost.setDescription(description);
-        newPost.setTag(tag);
-        newPost.setItemCategory(category);
-        newPost.setPostDate(postDate);
-        newPost.setIsFound(false);
-        newPost.setViewCount(0);
-        newPost.setLocation(locationText);
-        newPost.setLostDate("Chưa xác định");
-        newPost.setImageUrls(new ArrayList<>());
-        newPost.setContactInfo(contactInfo);
-
-        if (selectedImageUri != null) {
-            uploadImageToImgBB(postId, selectedImageUri, newPost);
-        } else {
-            postsRef.child(postId).setValue(newPost)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(PostsActivity.this, "Đăng tin thành công", Toast.LENGTH_SHORT).show();
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("POST_SUCCESS", true);
-                        setResult(RESULT_OK, resultIntent);
-                        openHome();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(PostsActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        }
-    }
-
-    private void openProfile() {
-        Intent intent = new Intent(PostsActivity.this, ProfileActivity.class);
-        startActivity(intent);
-    }
-
-    private void openNotification() {
-        Intent intent = new Intent(PostsActivity.this, NotificationActivity.class);
-        startActivity(intent);
-    }
-
-    private boolean openPost() {
-        return true;
-    }
-
+    // Các phương thức chuyển hướng đến các trang khác
     private void openHome() {
         Intent intent = new Intent(PostsActivity.this, Home.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -302,9 +310,18 @@ public class PostsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+    private void openNotification() {
+        Intent intent = new Intent(PostsActivity.this, NotificationActivity.class);
+        startActivity(intent);
+    }
+
+    private void openProfile() {
+        Intent intent = new Intent(PostsActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    private boolean openPost() {
+        return true;
     }
 
     @Override
@@ -314,33 +331,7 @@ public class PostsActivity extends AppCompatActivity {
             selectedImageUri = data.getData();
             imagePreview.setImageURI(selectedImageUri);
         } else if (requestCode == REQUEST_LOGIN && resultCode == Activity.RESULT_OK) {
-            SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
-            boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
-            if (isLoggedIn && mAuth.getCurrentUser() != null) {
-                initUi();
-                loadSpinnerData("tag", spinnerTag);
-                loadSpinnerData("itemCategory", spinnerCategory);
-                loadSpinnerData("location", spinnerLocation);
-                bottomNavigationBarAction();
-                btnPost.setOnClickListener(v -> createPost());
-            } else {
-                Toast.makeText(this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                openHome();
-            }
+            checkLoginStatus();
         }
-    }
-
-    private void initUi() {
-        bottomNav = findViewById(R.id.bottomNav);
-        editTitle = findViewById(R.id.edit_title);
-        editDescription = findViewById(R.id.edit_description);
-        editPhoneNumber = findViewById(R.id.edit_sdt);
-        spinnerTag = findViewById(R.id.spinner_tag);
-        spinnerCategory = findViewById(R.id.spinner_category);
-        btnPost = findViewById(R.id.btn_post);
-        imagePreview = findViewById(R.id.image_preview);
-        btnSelectImage = findViewById(R.id.btn_select_image);
-        spinnerLocation = findViewById(R.id.spinner_localtion);
-        btnSelectImage.setOnClickListener(v -> openImagePicker());
     }
 }
