@@ -1,12 +1,18 @@
 package com.example.findlostitemsapp.pages.home;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +21,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.findlostitemsapp.R;
 import com.example.findlostitemsapp.model.Post;
+import com.example.findlostitemsapp.pages.post.PostsActivity;
+import com.example.findlostitemsapp.pages.search.SearchActivity;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,11 +41,14 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
+    private static final String LOGIN_METHOD_GOOGLE = "google";
+    private static final String PREFS_NAME = "UserSession";
     private List<Post> postList;
     private Context context;
     private OnPostClickListener onPostClickListener;
     private HashMap<String, String> userNameCache;
     private DatabaseReference usersRef;
+    private SharedPreferences sharedPreferences;
     private static final String[] DATE_FORMATS = {
             "yyyy-MM-dd HH:mm:ss",
             "dd/MM/yyyy"
@@ -53,6 +66,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         this.postList = postList != null ? postList : new ArrayList<>();
         this.onPostClickListener = listener;
         this.userNameCache = new HashMap<>();
+        sharedPreferences = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         this.usersRef = FirebaseDatabase.getInstance().getReference("users");
         setHasStableIds(true);
     }
@@ -134,37 +148,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         holder.tvContact.setText("📞 " + post.getContactInfo());
         holder.tvLocation.setText("📍 " + post.getLocation());
-
-        // Lấy và hiển thị tên người dùng
         String userId = post.getUserId();
-        if (userId == null || userId.isEmpty()) {
-            holder.tvRole.setText("👤 Người dùng ẩn danh");
-            Log.w("PostAdapter", "userId null hoặc rỗng cho bài đăng: " + post.getPostId());
-        } else if (userNameCache.containsKey(userId)) {
-            holder.tvRole.setText("👤 " + userNameCache.get(userId));
-        } else {
-            usersRef.child(userId).child("userName").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String userName = snapshot.getValue(String.class);
-                    if (userName != null && !userName.isEmpty()) {
-                        userNameCache.put(userId, userName);
-                        holder.tvRole.setText("👤 " + userName);
-                    } else {
-                        userNameCache.put(userId, "Người dùng ẩn danh");
-                        holder.tvRole.setText("👤 Người dùng ẩn danh");
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e("PostAdapter", "Lỗi tải userName cho userId: " + userId, error.toException());
-                    userNameCache.put(userId, "Người dùng ẩn danh");
-                    holder.tvRole.setText("👤 Người dùng ẩn danh");
-                }
-            });
+        if(userId == null){
+            holder.tvRole.setText("👤 " + "Người dùng ẩn danh");
+        }else{
+            String loginMethod = sharedPreferences.getString("loginMethod", LOGIN_METHOD_GOOGLE);
+            if (LOGIN_METHOD_GOOGLE.equals(loginMethod)) {
+                getInforGoogle(holder);
+            } else {
+               getInforUser(userId, holder);
+            }
         }
 
+        // Lấy và hiển thị tên người dùng
         // Hiển thị ngày đăng bài
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         holder.tvPostDate.setText("📅 " + dateFormat.format(postDate));
@@ -176,6 +172,29 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         });
     }
 
+    private  void getInforUser(String userId,PostViewHolder holder ){
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String firstName = snapshot.child("firstName").getValue(String.class);
+                    String lastName = snapshot.child("lastName").getValue(String.class);
+                    String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                    holder.tvRole.setText("👤 " + fullName);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private  void getInforGoogle(PostViewHolder holder){
+        GoogleSignInAccount profile = GoogleSignIn.getLastSignedInAccount(context);
+
+        holder.tvRole.setText(profile.getDisplayName() != null ? profile.getDisplayName() : "Tên người dùng");
+    }
     @Override
     public int getItemCount() {
         return postList.size();

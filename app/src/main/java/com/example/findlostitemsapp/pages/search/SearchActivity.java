@@ -268,6 +268,7 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         postAdapter.updatePosts(postList);
         tvKetQua.setText("Tổng số bài đăng: " + postList.size());
         Toast.makeText(this, "Hiển thị tất cả " + postList.size() + " bài đăng.", Toast.LENGTH_SHORT).show();
+        loadPostsFromFirebase();
     }
 
     @Override
@@ -276,4 +277,5 @@ public class SearchActivity extends AppCompatActivity implements PostAdapter.OnP
         intent.putExtra("post_data", post);
         startActivity(intent);
     }
+
 }
